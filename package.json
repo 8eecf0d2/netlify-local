@@ -1,0 +1,27 @@
+{
+  "name": "netlify-local",
+  "version": "0.0.0",
+  "description": "Local Netlify service emulation",
+  "main": ".dist/index.js",
+  "repository": "https://github.com/8eecf0d2/netlify-local.git",
+  "author": "8eecf0d2 <8eecf0d23d248b0e6223b8a10ddbf1@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "watch": "tsc --project ./tsconfig.json --watch",
+    "build": "tsc --project ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/commander": "^2.12.2",
+    "@types/express": "^4.16.0",
+    "@types/node": "^10.11.7",
+    "@types/webpack": "^4.4.16"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "commander": "^2.19.0",
+    "express": "^4.16.4",
+    "toml": "^2.3.3",
+    "webpack": "^4.20.2"
+  }
+}
