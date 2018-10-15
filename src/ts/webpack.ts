@@ -14,8 +14,9 @@ export class Webpack {
   }
 
   public watch (): void {
+    console.log("netlify-local: webpack watching");
     this.compiler.watch({}, () => {
-      console.log("netlify-local: webpack build changed")
+      console.log("netlify-local: webpack rebuilt")
     });
   }
 }
