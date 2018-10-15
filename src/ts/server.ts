@@ -49,6 +49,7 @@ export class Server {
     return (request, response, next) => {
 
       const module = path.join(this.paths.lambda, request.params.lambda);
+
       delete require.cache[require.resolve(module)];
 
       let lambda: any;
@@ -91,16 +92,20 @@ export class Server {
     }
   }
 
-  public listen (): void {
-    this.express.listen(this.port, (error: Error) => {
-      if (error) {
-        console.error("netlify-local: unable to start server");
-        console.error(error);
-        process.exit(1);
-      }
+  public listen (): Promise<void> {
+    return new Promise(resolve => {
 
-      console.log(`netlify-local: server up on port ${this.port}`);
-    });
+      this.express.listen(this.port, (error: Error) => {
+        if (error) {
+          console.error("netlify-local: unable to start server");
+          console.error(error);
+          process.exit(1);
+        }
+
+        console.log(`netlify-local: server up on port ${this.port}`);
+        return resolve();
+      });
+    })
   }
 }
 

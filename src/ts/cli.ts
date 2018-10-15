@@ -19,17 +19,30 @@ program
 program
   .command("serve")
   .description("serve and rebuild files on change")
-  .action(() => {
-    const webpackConfig = program.webpack ? require(path.join(process.cwd(), program.webpack)) : false;
-    const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8"));
+  .action(async() => {
+    let webpackFileOption = program.webpack || "webpack.config.js";
+    let netlifyFileOption = program.netlify || "netlify.toml";
 
-    if(webpackConfig) {
-      const webpack = new Webpack(webpackConfig);
+    const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
+    const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), program.netlify || "netlify.toml"));
+
+    if(!webpackConfigExists && program.webpack) {
+      throw new Error(`Could not locate "${webpackFileOption}" file.`);
+    }
+
+    if(!netlifyConfigExists) {
+      throw new Error(`Could not locate "${netlifyFileOption}" file.`);
+    }
+
+    const server = new Server(toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8")), program.port || 9000);
+    await server.listen();
+
+    if(webpackConfigExists) {
+      console.log("netlify-local: webpack config loading");
+      const webpack = new Webpack(require(path.join(process.cwd(), webpackFileOption)));
       webpack.watch();
     }
 
-    const server = new Server(netlifyConfig, program.port || 9000);
-    server.listen();
   });
 
 program.parse(process.argv);
