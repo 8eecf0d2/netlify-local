@@ -25,7 +25,7 @@ export class Server {
     this.express = express();
     this.express.use(bodyParser.raw());
     this.express.use(bodyParser.text({type: "*/*"}));
-    this.express.use(serveStatic(this.paths.static))
+    this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
     this.routeLambdas();
     this.routeRedirects();
   }
