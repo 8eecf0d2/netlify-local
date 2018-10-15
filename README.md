@@ -1,4 +1,7 @@
 # Netlify Local
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/8eecf0d2/netlify-local.svg)](https://greenkeeper.io/)
+
 Local Netlify service emulation.
 
 **Experimental:** This package has not been heavily tested or used, some of the Netlify Services might be incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
