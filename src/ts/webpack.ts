@@ -4,7 +4,7 @@ export class Webpack {
   private compiler: webpack.Compiler;
 
   constructor(
-    private config: webpack.Configuration,
+    private config: Webpack.Config,
   ) {
     this.initialize();
   }
@@ -42,4 +42,8 @@ export class Webpack {
       console.log("netlify-local: webpack build success");
     });
   }
+}
+
+export namespace Webpack {
+  export interface Config extends webpack.Configuration {}
 }
