@@ -12,8 +12,8 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "packa
 program.version(packageJson.version);
 
 program
-  .option("-n --netlify <path>", "path to `netlify.toml` file (default `./netlify.toml`")
-  .option("-w --webpack <path>", "path to webpack config file (default `./webpack.config.js`")
+  .option("-n --netlify <path>", "path to `netlify.toml` file (default `./netlify.toml`)")
+  .option("-w --webpack <path>", "path to webpack config file (default `./webpack.config.js`)")
   .option("-p --port <port>", "port to serve from (default: 9000)")
 
 program
