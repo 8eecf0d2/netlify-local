@@ -1,6 +1,6 @@
 {
   "name": "netlify-local",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Local Netlify service emulation",
   "main": ".dist/index.js",
   "types": ".dist/index.d.ts",
@@ -12,7 +12,8 @@
   "license": "ISC",
   "scripts": {
     "watch": "tsc --project ./tsconfig.json --watch",
-    "build": "tsc --project ./tsconfig.json"
+    "build": "tsc --project ./tsconfig.json",
+    "test": "echo \"Success: no test specified\" && exit 0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
