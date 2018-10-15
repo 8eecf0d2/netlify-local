@@ -12,7 +12,8 @@
   "license": "ISC",
   "scripts": {
     "watch": "tsc --project ./tsconfig.json --watch",
-    "build": "tsc --project ./tsconfig.json"
+    "build": "tsc --project ./tsconfig.json",
+    "test": "echo \"Success: no test specified\" && exit 0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
