@@ -87,7 +87,8 @@ export class Server {
         response.setHeader(key, lambdaResponse.headers[key]);
       }
 
-      response.write(lambdaResponse.body);
+      const body = lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body;
+      response.write(body);
 
       response.end();
     }
