@@ -83,7 +83,7 @@ export class Server {
   }
 
   private static lambdaRequest (request: express.Request): Netlify.Handler.Request {
-    const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
+    const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application|multipart\/form-data/);
 
     return {
       path: request.path,
