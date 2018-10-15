@@ -61,13 +61,15 @@ export class Server {
         return response.status(500).json(`Function invocation failed: ${error.toString()}`);
       }
 
+      const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
+      const body = isBase64Encoded ? Buffer.from(request.body.toString(), "utf8").toString('base64') : request.body;
       const lambdaRequest = {
         path: request.path,
         httpMethod: request.method,
         queryStringParameters: queryString.parse(request.url.split("?")[1]),
         headers: request.headers,
-        body: request.body,
-        isBase64Encoded: false,
+        body: body,
+        isBase64Encoded: isBase64Encoded,
       }
 
       lambda.handler(lambdaRequest, {}, Server.lambdaCallback(response));
@@ -88,6 +90,7 @@ export class Server {
       }
 
       const body = lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body;
+
       response.write(body);
 
       response.end();
