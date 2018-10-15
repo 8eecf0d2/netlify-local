@@ -91,4 +91,4 @@ If you've got a pre-existing webpack config I'd suggest using a webpack helper l
 
 ### Credit
 
-This project is based entirely upon [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
+This project is inspired by [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
