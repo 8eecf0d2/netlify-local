@@ -19,30 +19,35 @@ program
 program
   .command("serve")
   .description("serve and rebuild files on change")
-  .action(async() => {
-    let webpackFileOption = program.webpack || "webpack.config.js";
-    let netlifyFileOption = program.netlify || "netlify.toml";
+  .action(() => {
+    (async () => {
+      let webpackFileOption = program.webpack || "webpack.config.js";
+      let netlifyFileOption = program.netlify || "netlify.toml";
 
-    const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
-    const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), program.netlify || "netlify.toml"));
+      const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
+      const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), program.netlify || "netlify.toml"));
 
-    if(!webpackConfigExists && program.webpack) {
-      throw new Error(`Could not locate "${webpackFileOption}" file.`);
-    }
+      if(!webpackConfigExists && program.webpack) {
+        throw new Error(`Could not locate "${webpackFileOption}" file.`);
+      }
 
-    if(!netlifyConfigExists) {
-      throw new Error(`Could not locate "${netlifyFileOption}" file.`);
-    }
+      if(!netlifyConfigExists) {
+        throw new Error(`Could not locate "${netlifyFileOption}" file.`);
+      }
 
-    const server = new Server(toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8")), program.port || 9000);
-    await server.listen();
+      const server = new Server(toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8")), program.port || 9000);
+      await server.listen();
 
-    if(webpackConfigExists) {
-      console.log("netlify-local: webpack config loading");
-      const webpack = new Webpack(require(path.join(process.cwd(), webpackFileOption)));
-      webpack.watch();
-    }
-
+      if(webpackConfigExists) {
+        console.log("netlify-local: webpack config loading");
+        const webpack = new Webpack(require(path.join(process.cwd(), webpackFileOption)));
+        webpack.watch();
+      }
+    })()
+      .catch(error => {
+        console.log(error)
+        process.exit(1);
+      })
   });
 
 program.parse(process.argv);
