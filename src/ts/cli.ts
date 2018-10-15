@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as program from "commander";
 import * as toml from "toml";
+import * as gitBranch from "git-branch";
 
 import { Netlify } from "./netlify";
 import { Server } from "./server";
@@ -34,7 +35,18 @@ program
         throw new Error(`Could not locate "${netlifyFileOption}" file.`);
       }
 
-      const server = new Server(toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8")), program.port || 9000);
+      const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8"));
+
+      const currentBranch = gitBranch.sync();
+
+      if(netlifyConfig.context && netlifyConfig.context[currentBranch]) {
+        netlifyConfig.build = {
+          ...netlifyConfig.build,
+          ...netlifyConfig.context[currentBranch],
+        }
+      }
+
+      const server = new Server(netlifyConfig, program.port || 9000);
       await server.listen();
 
       if(webpackConfigExists) {
