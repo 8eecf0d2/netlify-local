@@ -3,6 +3,10 @@ Local Netlify service emulation.
 
 **Note:** This project is experimental, none of the supported Netlify Services are correctly implemented.
 
+This project aims to be as _"hands off"_ as possible, simply emulating different parts of Netlify.
+
+For help bundling your Javascript to work with Netlify Functions, checkout [8eecf0d2/webpack-netlify-lambda-plugin](https://github.com/8eecf0d2/webpack-netlify-lambda-plugin) or [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
+
 ### Install
 ```bash
 yarn global add netlify-local
