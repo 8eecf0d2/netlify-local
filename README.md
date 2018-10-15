@@ -39,9 +39,13 @@ Options:
   -h, --help           output usage information
 ```
 
+### API
+
+Specific classes and methods are exposed for running `netlify-local` programmatically, see [Issue #6](https://github.com/8eecf0d2/netlify-local/issues/6) for more information / documentation.
+
 ### Typings
 
-You can access typescript types for Netlify Function handlers.
+Relevant Typescript typings are exposed for the API and also Netlify Function handlers.
 ```ts
 import { Netlify } from "netlify-local";
 
