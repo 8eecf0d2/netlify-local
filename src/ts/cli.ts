@@ -17,8 +17,7 @@ program
   .option("-p --port <port>", "port to serve from (default: 9000)")
 
 program
-  .command("serve")
-  .description("serve and rebuild files on change")
+  .description("Locally emulate Netlify services")
   .action(() => {
     (async () => {
       let webpackFileOption = program.webpack || "webpack.config.js";

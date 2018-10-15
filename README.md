@@ -19,15 +19,16 @@ netlify-local -n netlify.toml -w webpack.config.js
 
 ### Options
 ```bash
+Usage: netlify-local [options]
+
+Locally emulate Netlify services
+
 Options:
   -V, --version        output the version number
-  -n --netlify <path>  path to netlify toml configuration file (default `./netlify.toml`)
+  -n --netlify <path>  path to `netlify.toml` file (default `./netlify.toml`)
   -w --webpack <path>  path to webpack config file (default `./webpack.config.js`)
   -p --port <port>     port to serve from (default: 9000)
   -h, --help           output usage information
-
-Commands:
-  serve                serve and rebuild files on change
 ```
 
 ### Todo
