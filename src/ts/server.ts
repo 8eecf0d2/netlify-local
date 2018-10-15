@@ -2,6 +2,7 @@ import * as path from "path";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as serveStatic from "serve-static";
+import * as queryString from "querystring";
 
 import { Netlify } from "./netlify";
 
@@ -63,7 +64,7 @@ export class Server {
       const lambdaRequest = {
         path: request.path,
         httpMethod: request.method,
-        queryStringParameters: request.query,
+        queryStringParameters: queryString.parse(request.url.split("?")[1]),
         headers: request.headers,
         body: request.body,
         isBase64Encoded: false,
