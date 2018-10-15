@@ -19,6 +19,8 @@ export class Webpack {
       this.compiler.run((error, status) => {
         if(error) {
           console.log("netlify-local: webpack build failure");
+          console.error(error);
+
           return reject(error);
         }
         console.log("netlify-local: webpack build success");

@@ -139,7 +139,7 @@ export class Server {
     return new Promise(resolve => {
       this.server = this.express.listen(this.port, (error: Error) => {
         if (error) {
-          console.error("netlify-local: unable to start server");
+          console.log("netlify-local: unable to start server");
           console.error(error);
           process.exit(1);
         }
