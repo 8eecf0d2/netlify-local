@@ -63,53 +63,62 @@ export class Server {
         return response.status(500).json(`Function invocation failed: ${error.toString()}`);
       }
 
-      const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
-
-      const lambdaRequest = {
-        path: request.path,
-        httpMethod: request.method,
-        queryStringParameters: queryString.parse(request.url.split("?")[1]),
-        headers: request.headers,
-        body: isBase64Encoded ? Buffer.from(request.body.toString(), "utf8").toString('base64') : request.body,
-        isBase64Encoded: isBase64Encoded,
-      }
-
-      let lambdaContext: any = {};
-
-      if(request.headers["authorization" || "Authorization"]) {
-        const bearerToken = String(request.headers["authorization" || "Authorization"]).split(" ")[1];
-        lambdaContext = {
-          identity: { url: '', token: '' },
-          user: jwt.decode(bearerToken),
-        }
-      }
+      const lambdaRequest = Server.lambdaRequest(request);
+      const lambdaContext = Server.lambdaContext(request);
 
       const lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
 
       if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
         return lambdaExecution
           .then(lambdaResponse => {
-            return Server.handleResponse(response, lambdaResponse);
+            return Server.handleLambdaResponse(response, lambdaResponse);
           })
           .catch(error => {
-            return Server.handleError(response, error);
+            return Server.handleLambdaError(response, error);
           });
       }
     }
+  }
+
+  static lambdaRequest (request: express.Request): Netlify.Handler.Request {
+    const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
+
+    return {
+      path: request.path,
+      httpMethod: request.method,
+      queryStringParameters: queryString.parse(request.url.split("?")[1]),
+      headers: request.headers,
+      body: isBase64Encoded ? Buffer.from(request.body.toString(), "utf8").toString('base64') : request.body,
+      isBase64Encoded: isBase64Encoded,
+    }
+  }
+
+  static lambdaContext (request: express.Request): Netlify.Handler.Context {
+    let lambdaContext: Netlify.Handler.Context = {}
+
+    if(request.headers["authorization" || "Authorization"]) {
+      const bearerToken = String(request.headers["authorization" || "Authorization"]).split(" ")[1];
+      lambdaContext = {
+        identity: { url: '', token: '' },
+        user: jwt.decode(bearerToken),
+      }
+    }
+
+    return lambdaContext;
   }
 
   static lambdaCallback (response: express.Response): any {
     return (error: Error, lambdaResponse: Netlify.Handler.Response) => {
       if (error) {
 
-        return Server.handleError(response, error);
+        return Server.handleLambdaError(response, error);
       }
 
-      return Server.handleResponse(response, lambdaResponse);
+      return Server.handleLambdaResponse(response, lambdaResponse);
     }
   }
 
-  static handleResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
+  static handleLambdaResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
     response.statusCode = lambdaResponse.statusCode;
 
     for (const key in lambdaResponse.headers) {
@@ -120,7 +129,7 @@ export class Server {
     response.end();
   }
 
-  static handleError (response: express.Response, error: Error): express.Response {
+  static handleLambdaError (response: express.Response, error: Error): express.Response {
     return response.status(500).json(`Function invocation failed: ${error.toString()}`);
   }
 
