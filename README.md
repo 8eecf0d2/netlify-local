@@ -10,11 +10,14 @@ For help bundling your Javascript to work with Netlify Functions, checkout [8eec
 An example Netlify deployable application is available at [8eecf0d2/netlify-local-example](https://github.com/8eecf0d2/netlify-local-example).
 
 ### Install
+
+You should probably install as a dev dependency, but globally works too.
 ```bash
-yarn global add netlify-local
+yarn add -D netlify-local
 ```
 
 ### Usage
+
 ```bash
 netlify-local -n netlify.toml -w webpack.config.js
 ```
@@ -33,16 +36,34 @@ Options:
   -h, --help           output usage information
 ```
 
-### Todo
+### Typings
 
-- [ ] Write documentation
-- [x] Publish example repository [8eecf0d2/netlify-local-example](https://github.com/8eecf0d2/netlify-local-example)
+You can access typescript types for Netlify Function handlers.
+```ts
+import { Netlify } from "netlify-local";
 
-Implement the following Netlify features as correctly as possible
+export const handler: Netlify.Handler<handler.Request, handler.Context, handler.Response> = (request, context, callback) => {
 
-- [ ] Netlify static file server
-- [ ] Netlify functions
-- [ ] `netlify.toml` options (_context_, _redirect_, _headers_)
+  return callback(null, {
+    statusCode: 200,
+    body: "foo"
+  })
+}
+
+export namespace handler {
+  export interface Request extends Netlify.Handler.Request {
+    headers: {
+      example: string;
+    }
+  }
+  export interface Context extends Netlify.Handler.Context {
+    user: { ... }
+  }
+  export interface Response extends Netlify.Handler.Response {
+    body: { ... };
+  }
+}
+```
 
 ### Credit
 
