@@ -1,7 +1,7 @@
 # Netlify Local
 Local Netlify service emulation.
 
-**Experimental:** None of the supported Netlify Services are correctly implemented yet.
+**Experimental:** This package has not been heavily tested or used, some of the Netlify Services might be incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
 
 This project aims to be as _"hands off"_ as possible, simply emulating different parts of Netlify.
 
