@@ -26,8 +26,8 @@ export class Server {
       lambda: path.join(process.cwd(), this.netlifyConfig.build.functions),
     }
     this.express = express();
-    this.express.use(bodyParser.raw());
-    this.express.use(bodyParser.text({type: "*/*"}));
+    this.express.use(bodyParser.raw({ limit: "6mb" }));
+    this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
     this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
     this.routeLambdas();
     this.routeRedirects();
