@@ -46,6 +46,12 @@ program
         }
       }
 
+      if(netlifyConfig.build.environment) {
+        for(const variable in netlifyConfig.build.environment) {
+          process.env[variable] = netlifyConfig.build.environment[variable];
+        }
+      }
+
       const server = new Server(netlifyConfig, program.port || 9000);
       await server.listen();
 
