@@ -42,12 +42,52 @@ export class Server {
   }
 
   private routeLambdas (): void {
-    this.express.all("/.netlify/functions/*", this.handleLambda());
+    this.express.all("/.netlify/functions/:lambda", this.handleLambda());
   }
 
   private handleLambda (): express.Handler {
     return (request, response, next) => {
-      response.status(200).json("lambda!");
+
+      const module = path.join(this.paths.lambda, request.params.lambda);
+      delete require.cache[require.resolve(module)];
+
+      let lambda: any;
+      try {
+        lambda = require(module);
+      } catch (error) {
+
+        return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+      }
+
+      const lambdaRequest = {
+        path: request.path,
+        httpMethod: request.method,
+        queryStringParameters: request.query,
+        headers: request.headers,
+        body: request.body,
+        isBase64Encoded: false,
+      }
+
+      lambda.handler(lambdaRequest, {}, Server.lambdaCallback(response));
+    }
+  }
+
+  static lambdaCallback (response: express.Response): any {
+      return (error: Error, lambdaResponse: any) => {
+      if (error) {
+
+        return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+      }
+
+      response.statusCode = lambdaResponse.statusCode;
+
+      for (const key in lambdaResponse.headers) {
+        response.setHeader(key, lambdaResponse.headers[key]);
+      }
+
+      response.write(lambdaResponse.body);
+
+      response.end();
     }
   }
 
