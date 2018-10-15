@@ -73,11 +73,9 @@ export class Server {
       if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
         return lambdaExecution
           .then(lambdaResponse => {
-            return Server.handleLambdaResponse(response, {
-              statusCode: 200,
-              body: lambdaResponse,
-              ...typeof lambdaResponse === "string" ? {} : lambdaResponse
-            });
+            const parsedResponse = typeof lambdaResponse === "string" ? { statusCode: 200, body: lambdaResponse } : lambdaResponse;
+
+            return Server.handleLambdaResponse(response, parsedResponse);
           })
           .catch(error => {
             return Server.handleLambdaError(response, error);
