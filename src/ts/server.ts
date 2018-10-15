@@ -72,14 +72,8 @@ export class Server {
 
       if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
         return lambdaExecution
-          .then(lambdaResponse => {
-            const parsedResponse = typeof lambdaResponse === "string" ? { statusCode: 200, body: lambdaResponse } : lambdaResponse;
-
-            return Server.handleLambdaResponse(response, parsedResponse);
-          })
-          .catch(error => {
-            return Server.handleLambdaError(response, error);
-          });
+          .then(lambdaResponse => Server.handleLambdaResponse(response, lambdaResponse))
+          .catch(error => Server.handleLambdaError(response, error));
       }
     }
   }
@@ -123,13 +117,15 @@ export class Server {
   }
 
   private static handleLambdaResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
-    response.statusCode = lambdaResponse.statusCode;
+    const parsedResponse = typeof lambdaResponse === "string" ? { statusCode: 200, body: lambdaResponse } : lambdaResponse;
 
-    for (const key in lambdaResponse.headers) {
-      response.setHeader(key, lambdaResponse.headers[key]);
+    response.statusCode = parsedResponse.statusCode;
+
+    for (const key in parsedResponse.headers) {
+      response.setHeader(key, parsedResponse.headers[key]);
     }
 
-    response.write(lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body);
+    response.write(parsedResponse.isBase64Encoded ? Buffer.from(parsedResponse.body, "base64") : parsedResponse.body);
     response.end();
   }
 
