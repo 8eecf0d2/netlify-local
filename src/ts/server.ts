@@ -54,7 +54,7 @@ export class Server {
 
       delete require.cache[require.resolve(module)];
 
-      let lambda: any;
+      let lambda: { handler: Netlify.Handler };
       try {
         lambda = require(module);
       } catch (error) {
@@ -83,26 +83,44 @@ export class Server {
         }
       }
 
-      lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+      const lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+
+      if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
+        return lambdaExecution
+          .then(lambdaResponse => {
+            return Server.handleResponse(response, lambdaResponse);
+          })
+          .catch(error => {
+            return Server.handleError(response, error);
+          });
+      }
     }
   }
 
   static lambdaCallback (response: express.Response): any {
-    return (error: Error, lambdaResponse: any) => {
+    return (error: Error, lambdaResponse: Netlify.Handler.Response) => {
       if (error) {
 
-        return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+        return Server.handleError(response, error);
       }
 
-      response.statusCode = lambdaResponse.statusCode;
-
-      for (const key in lambdaResponse.headers) {
-        response.setHeader(key, lambdaResponse.headers[key]);
-      }
-
-      response.write(lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body);
-      response.end();
+      return Server.handleResponse(response, lambdaResponse);
     }
+  }
+
+  static handleResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
+    response.statusCode = lambdaResponse.statusCode;
+
+    for (const key in lambdaResponse.headers) {
+      response.setHeader(key, lambdaResponse.headers[key]);
+    }
+
+    response.write(lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body);
+    response.end();
+  }
+
+  static handleError (response: express.Response, error: Error): express.Response {
+    return response.status(500).json(`Function invocation failed: ${error.toString()}`);
   }
 
   public listen (): Promise<void> {
