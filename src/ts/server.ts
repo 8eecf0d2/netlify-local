@@ -4,11 +4,13 @@ import * as bodyParser from "body-parser";
 import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
+import * as http from "http";
 
 import { Netlify } from "./netlify";
 
 export class Server {
   private express: express.Express;
+  private server: http.Server;
   private paths: Server.Paths;
 
   constructor(
@@ -135,8 +137,7 @@ export class Server {
 
   public listen (): Promise<void> {
     return new Promise(resolve => {
-
-      this.express.listen(this.port, (error: Error) => {
+      this.server = this.express.listen(this.port, (error: Error) => {
         if (error) {
           console.error("netlify-local: unable to start server");
           console.error(error);
@@ -146,7 +147,16 @@ export class Server {
         console.log(`netlify-local: server up on port ${this.port}`);
         return resolve();
       });
-    })
+    });
+  }
+
+  public stop (): Promise<void> {
+    return new Promise(resolve => {
+      this.server.close(() => {
+        console.log(`netlify-local: server down on port ${this.port}`);
+        resolve();
+      });
+    });
   }
 }
 
