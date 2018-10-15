@@ -25,7 +25,7 @@ export class Server {
     this.express = express();
     this.express.use(bodyParser.raw());
     this.express.use(bodyParser.text({type: "*/*"}));
-    this.express.use(serveStatic(this.paths.static))
+    this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
     this.routeLambdas();
     this.routeRedirects();
   }
@@ -61,13 +61,15 @@ export class Server {
         return response.status(500).json(`Function invocation failed: ${error.toString()}`);
       }
 
+      const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
+
       const lambdaRequest = {
         path: request.path,
         httpMethod: request.method,
         queryStringParameters: queryString.parse(request.url.split("?")[1]),
         headers: request.headers,
-        body: request.body,
-        isBase64Encoded: false,
+        body: isBase64Encoded ? Buffer.from(request.body.toString(), "utf8").toString('base64') : request.body,
+        isBase64Encoded: isBase64Encoded,
       }
 
       lambda.handler(lambdaRequest, {}, Server.lambdaCallback(response));
@@ -75,7 +77,7 @@ export class Server {
   }
 
   static lambdaCallback (response: express.Response): any {
-      return (error: Error, lambdaResponse: any) => {
+    return (error: Error, lambdaResponse: any) => {
       if (error) {
 
         return response.status(500).json(`Function invocation failed: ${error.toString()}`);
@@ -87,9 +89,7 @@ export class Server {
         response.setHeader(key, lambdaResponse.headers[key]);
       }
 
-      const body = lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body;
-      response.write(body);
-
+      response.write(lambdaResponse.isBase64Encoded ? Buffer.from(lambdaResponse.body, "base64") : lambdaResponse.body);
       response.end();
     }
   }
