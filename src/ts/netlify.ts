@@ -20,15 +20,16 @@ export namespace Netlify {
       headers?: {
         [key: string]: string;
       }
+      isBase64Encoded?: boolean;
     }
     export interface Request {
       path: string;
       httpMethod: string;
       queryStringParameters: {
-        [key: string]: string;
+        [key: string]: string | string[];
       };
       headers: {
-        [key: string]: string;
+        [key: string]: string | string[];
       };
       body: any;
       isBase64Encoded: boolean;
