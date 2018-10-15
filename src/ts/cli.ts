@@ -25,7 +25,7 @@ program
       let netlifyFileOption = program.netlify || "netlify.toml";
 
       const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
-      const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), program.netlify || "netlify.toml"));
+      const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), netlifyFileOption));
 
       if(!webpackConfigExists && program.webpack) {
         throw new Error(`Could not locate "${webpackFileOption}" file.`);
@@ -35,7 +35,7 @@ program
         throw new Error(`Could not locate "${netlifyFileOption}" file.`);
       }
 
-      const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), program.netlify), "utf8"));
+      const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), netlifyFileOption), "utf8"));
 
       const currentBranch = gitBranch.sync();
 

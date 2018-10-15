@@ -3,6 +3,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
+import * as jwt from "jsonwebtoken";
 
 import { Netlify } from "./netlify";
 
@@ -72,7 +73,17 @@ export class Server {
         isBase64Encoded: isBase64Encoded,
       }
 
-      lambda.handler(lambdaRequest, {}, Server.lambdaCallback(response));
+      let lambdaContext: any = {};
+
+      if(request.headers["authorization" || "Authorization"]) {
+        const bearerToken = String(request.headers["authorization" || "Authorization"]).split(" ")[1];
+        lambdaContext = {
+          identity: { url: '', token: '' },
+          user: jwt.decode(bearerToken),
+        }
+      }
+
+      lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
     }
   }
 
