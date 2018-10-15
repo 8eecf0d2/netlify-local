@@ -36,7 +36,7 @@ Options:
 ### Todo
 
 - [ ] Write documentation
-- [ ] Publish example repository
+- [x] Publish example repository [8eecf0d2/netlify-local-example](https://github.com/8eecf0d2/netlify-local-example)
 
 Implement the following Netlify features as correctly as possible
 
