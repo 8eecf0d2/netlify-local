@@ -35,11 +35,11 @@ export namespace Netlify {
       isBase64Encoded: boolean;
     }
     export interface Context {
-      identity: {
+      identity?: {
         url: string;
         token: string;
       };
-      user: any;
+      user?: any;
     }
     export type Callback<ResponseType> = (error: boolean, response: ResponseType) => void;
   }
