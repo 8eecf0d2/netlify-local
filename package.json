@@ -1,8 +1,12 @@
 {
   "name": "netlify-local",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Local Netlify service emulation",
   "main": ".dist/index.js",
+  "types": ".dist/index.d.ts",
+  "bin": {
+    "netlify-local": ".dist/index.js"
+  },
   "repository": "https://github.com/8eecf0d2/netlify-local.git",
   "author": "8eecf0d2 <8eecf0d23d248b0e6223b8a10ddbf1@gmail.com>",
   "license": "ISC",
