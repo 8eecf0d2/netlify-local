@@ -1,11 +1,12 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as toml from "toml";
+import * as webpack from "webpack";
 import * as gitBranch from "git-branch";
 
 import { Netlify } from "./netlify";
 
-export const parseWebpackConfig = (filename: string): any => {
+export const parseWebpackConfig = (filename: string): webpack.Configuration | false => {
   const webpackFileOption = filename || "webpack.config.js";
   const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
   if(!webpackConfigExists && filename) {

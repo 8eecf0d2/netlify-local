@@ -4,7 +4,7 @@ export class Webpack {
   private compiler: webpack.Compiler;
 
   constructor(
-    private config: Webpack.Config,
+    private config: webpack.Configuration,
   ) {
     this.initialize();
   }
@@ -13,10 +13,10 @@ export class Webpack {
     this.compiler = webpack(this.config);
   }
 
-  public build (): Promise<any> {
+  public build (): Promise<webpack.Stats> {
     return new Promise((resolve, reject) => {
       console.log("netlify-local: webpack build started");
-      this.compiler.run((error, status) => {
+      this.compiler.run((error, stats) => {
         if(error) {
           console.log("netlify-local: webpack build failure");
           console.error(error);
@@ -24,14 +24,14 @@ export class Webpack {
           return reject(error);
         }
         console.log("netlify-local: webpack build success");
-        return resolve(status);
+        return resolve(stats);
       });
     });
   }
 
   public watch (): void {
     console.log("netlify-local: webpack watching");
-    this.compiler.watch({}, (error, status) => {
+    this.compiler.watch({}, (error, stats) => {
       if(error) {
         console.log("netlify-local: webpack build failure");
         console.error(error);
@@ -42,8 +42,4 @@ export class Webpack {
       console.log("netlify-local: webpack build success");
     });
   }
-}
-
-export namespace Webpack {
-  export type Config = any;
 }
