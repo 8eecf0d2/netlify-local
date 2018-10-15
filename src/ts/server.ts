@@ -150,7 +150,7 @@ export class Server {
     });
   }
 
-  public stop (): Promise<void> {
+  public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
         console.log(`netlify-local: server down on port ${this.port}`);
