@@ -49,6 +49,7 @@ export class Server {
 
   private handleLambda (): express.Handler {
     return (request, response, next) => {
+      console.log(`netlify-local: lambda invoked "${request.params.lambda}"`);
 
       const module = path.join(this.paths.lambda, request.params.lambda);
 
