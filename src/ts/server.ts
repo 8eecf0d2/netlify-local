@@ -8,8 +8,8 @@ import * as jwt from "jsonwebtoken";
 import { Netlify } from "./netlify";
 
 export class Server {
-  public express: express.Express;
-  public paths: Server.Paths;
+  private express: express.Express;
+  private paths: Server.Paths;
 
   constructor(
     private netlifyConfig: Netlify.Config,
@@ -18,7 +18,7 @@ export class Server {
     this.initialize();
   }
 
-  public initialize (): void {
+  private initialize (): void {
     this.paths = {
       static: path.join(process.cwd(), this.netlifyConfig.build.publish),
       lambda: path.join(process.cwd(), this.netlifyConfig.build.functions),
@@ -37,7 +37,7 @@ export class Server {
     }
   }
 
-  public handleRedirect(from: string, to: string): void {
+  private handleRedirect(from: string, to: string): void {
     this.express.get(from, (request, response, next) => {
       return response.status(200).sendFile(path.join(this.paths.static, to));
     });
@@ -80,7 +80,7 @@ export class Server {
     }
   }
 
-  static lambdaRequest (request: express.Request): Netlify.Handler.Request {
+  private static lambdaRequest (request: express.Request): Netlify.Handler.Request {
     const isBase64Encoded = request.body && !(request.headers["content-type"] || "").match(/text|application/);
 
     return {
@@ -93,7 +93,7 @@ export class Server {
     }
   }
 
-  static lambdaContext (request: express.Request): Netlify.Handler.Context {
+  private static lambdaContext (request: express.Request): Netlify.Handler.Context {
     let lambdaContext: Netlify.Handler.Context = {}
 
     if(request.headers["authorization" || "Authorization"]) {
@@ -107,7 +107,7 @@ export class Server {
     return lambdaContext;
   }
 
-  static lambdaCallback (response: express.Response): any {
+  private static lambdaCallback (response: express.Response): any {
     return (error: Error, lambdaResponse: Netlify.Handler.Response) => {
       if (error) {
 
@@ -118,7 +118,7 @@ export class Server {
     }
   }
 
-  static handleLambdaResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
+  private static handleLambdaResponse (response: express.Response, lambdaResponse: Netlify.Handler.Response): void {
     response.statusCode = lambdaResponse.statusCode;
 
     for (const key in lambdaResponse.headers) {
