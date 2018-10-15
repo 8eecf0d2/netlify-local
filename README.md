@@ -63,6 +63,32 @@ export namespace handler {
 }
 ```
 
+### Webpack Issues
+
+To correctly execute lambda's they must be self contained bundles, a common issue when bundled incorrectly is missing modules similar to the error below.
+
+```bash
+Error: Cannot find module '/.../path/file'
+```
+
+To bundle your files correctly ensure that `module.exports.handler` is exposed for each handler file and that you're using individual entires within webpack.
+
+```js
+module.exports = {
+  target: "node",
+  entry: {
+    foo: "./src/ts/handlers/foo.ts",
+    bar: "./src/ts/handlers/bar.ts",
+    ...
+  },
+  ...
+}
+```
+
+If you're starting a new project or not currently bundling, the easiest solution would be to use [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda) and it's `build` command.
+
+If you've got a pre-existing webpack config I'd suggest using a webpack helper library such as [8eecf0d2/webpack-netlify-lambda-plugin](https://github.com/8eecf0d2/webpack-netlify-lambda-plugin).
+
 ### Credit
 
 This project is based entirely upon [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
