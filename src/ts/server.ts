@@ -77,7 +77,7 @@ export class Server {
   }
 
   static lambdaCallback (response: express.Response): any {
-      return (error: Error, lambdaResponse: any) => {
+    return (error: Error, lambdaResponse: any) => {
       if (error) {
 
         return response.status(500).json(`Function invocation failed: ${error.toString()}`);
