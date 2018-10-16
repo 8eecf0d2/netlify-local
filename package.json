@@ -15,7 +15,7 @@
     "build": "tsc --project ./tsconfig.json",
     "pretest": "yarn run build",
     "test": "ts-mocha --project ./test/tsconfig.json test/**/*.ts",
-    "test:now": "ts-mocha test/**/*.ts"
+    "test:now": "ts-mocha --project ./test/tsconfig.json test/**/*.ts"
   },
   "devDependencies": {
     "@types/assert": "^1.4.0",
