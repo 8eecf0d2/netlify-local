@@ -9,3 +9,30 @@
   publish = "default-publish"
   functions = "default-functions"
   command = "default-command"
+
+[[redirects]]
+  from = "/redirect-from-a"
+  to = "/redirect-to-a"
+  status = 200
+
+[[redirects]]
+  from = "/redirect-from-b"
+  to = "/redirect-to-b"
+  status = 200
+
+[[redirects]]
+  from = "/redirect-from-header"
+  to = "/redirect-to-header"
+  status = 200
+  [redirects.headers]
+    Redirect-Header = ""
+
+[[headers]]
+  for = "/headers-for-a"
+  [headers.values]
+    Header-A = ""
+
+[[headers]]
+  for = "/headers-for-b"
+  [headers.values]
+    Header-B = ""
