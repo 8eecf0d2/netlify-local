@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as program from "commander";
 
+import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
 import { Webpack } from "./webpack";
@@ -35,7 +36,7 @@ program
       }
     })()
       .catch(error => {
-        console.log(error)
+        Logger.info(error)
         process.exit(1);
       })
   });

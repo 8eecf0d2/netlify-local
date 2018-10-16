@@ -1,4 +1,5 @@
 import * as webpack from "webpack";
+import { Logger } from "./helper";
 
 export class Webpack {
   private compiler: webpack.Compiler;
@@ -15,31 +16,31 @@ export class Webpack {
 
   public build (): Promise<webpack.Stats> {
     return new Promise((resolve, reject) => {
-      console.log("netlify-local: webpack build started");
+      Logger.info("netlify-local: webpack build started");
       this.compiler.run((error, stats) => {
         if(error) {
-          console.log("netlify-local: webpack build failure");
-          console.error(error);
+          Logger.info("netlify-local: webpack build failure");
+          Logger.error(error);
 
           return reject(error);
         }
-        console.log("netlify-local: webpack build success");
+        Logger.info("netlify-local: webpack build success");
         return resolve(stats);
       });
     });
   }
 
   public watch (): void {
-    console.log("netlify-local: webpack watching");
+    Logger.info("netlify-local: webpack watching");
     this.compiler.watch({}, (error, stats) => {
       if(error) {
-        console.log("netlify-local: webpack build failure");
-        console.error(error);
+        Logger.info("netlify-local: webpack build failure");
+        Logger.error(error);
 
         return;
       }
 
-      console.log("netlify-local: webpack build success");
+      Logger.info("netlify-local: webpack build success");
     });
   }
 }
