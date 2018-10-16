@@ -21,6 +21,14 @@ You should probably install as a dev dependency, but globally works too.
 yarn add -D netlify-local
 ```
 
+### Features
+
+#### Static Router
+The **static router** refers to the [Netlify Continuous Deployment](https://www.netlify.com/docs/continuous-deployment) feature which serves files from the `build.publish` directory, specified within the toml configuration.
+
+#### Lambda Router
+The **lambda router** refers to the [Netlify Functions](https://www.netlify.com/features/functions) feature which serves Lambda's or Cloud Functions from the `build.functions` directory, specified within the toml configuration.
+
 ### Commands
 
 #### `serve`
