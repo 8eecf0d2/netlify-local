@@ -78,5 +78,16 @@ mocha.describe('Server', () => {
 
       server.close();
     });
+
+    mocha.it('should add lambda route', async () => {
+      const server = await createServer();
+
+      //@ts-ignore
+      const lambdaRoute = server.express._router.stack.find(route => route.route && route.route.path === "/.netlify/functions/:lambda");
+
+      assert.notEqual(lambdaRoute, undefined);
+
+      server.close();
+    });
   });
 });
