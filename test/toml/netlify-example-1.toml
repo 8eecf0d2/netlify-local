@@ -1,0 +1,17 @@
+[build]
+  base = "default-base"
+  publish = "default-publish"
+  functions = "default-functions"
+  command = "default-command"
+
+[context.master]
+  base = "master-base"
+  publish = "master-publish"
+  functions = "master-functions"
+  command = "master-command"
+
+[context.develop]
+  base = "develop-base"
+  publish = "develop-publish"
+  functions = "develop-functions"
+  command = "develop-command"
