@@ -28,20 +28,50 @@ export class Server {
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
     this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
+    this.routeHeaders();
     this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
     this.routeLambdas();
     this.routeRedirects();
   }
 
-  private routeRedirects (): void {
-    for(const redirect of this.netlifyConfig.redirects) {
-      this.handleRedirect(redirect.from, redirect.to);
+  private routeHeaders (): void {
+    if(!this.netlifyConfig.headers) {
+      return
+    }
+
+    for(const header of this.netlifyConfig.headers) {
+      this.handleHeader(header.for, header.values)
     }
   }
 
-  private handleRedirect(from: string, to: string): void {
-    this.express.get(from, (request, response, next) => {
-      return response.status(200).sendFile(path.join(this.paths.static, to));
+  private handleHeader (path: string, headers: { [key: string]: string }): void {
+    this.express.all(path, (request, response, next) => {
+      for(const header in headers) {
+        response.setHeader(header, headers[header]);
+      }
+      next();
+    })
+  }
+
+  private routeRedirects (): void {
+    if(!this.netlifyConfig.redirects) {
+      return
+    }
+
+    for(const redirect of this.netlifyConfig.redirects) {
+      this.handleRedirect(redirect);
+    }
+  }
+
+  private handleRedirect(redirect: Netlify.Redirect): void {
+    this.express.get(redirect.from, (request, response, next) => {
+      if(redirect.headers) {
+        for(const header in redirect.headers) {
+          response.setHeader(header, redirect.headers[header]);
+        }
+      }
+
+      return response.status(redirect.status || 200).redirect(redirect.to);
     });
   }
 
