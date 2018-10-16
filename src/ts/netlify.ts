@@ -8,10 +8,20 @@ export namespace Netlify {
     }
     context: any;
     redirects: Netlify.Redirect[];
+    headers: Netlify.Headers[];
   }
   export interface Redirect {
     from: string;
     to: string;
+    headers?: {
+      [key: string]: string;
+    };
+  }
+  export interface Headers {
+    for: string;
+    values: {
+      [key: string]: string;
+    }
   }
   export namespace Handler {
     export interface Response {
