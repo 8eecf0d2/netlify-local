@@ -56,7 +56,7 @@ netlify-local -n app-functions/netlify.toml
 
 ##### `-w --webpack`
 
-Optionally, **netlify-local** can run a Webpack watcher and rebuild your source files as you develop without the need to start and stop the web server. To use this feature pass in the `-w --webpack` option with a relative path to your config.
+Optionally, **netlify-local** can run a Webpack watcher and rebuild your source files as you develop without the need to start and stop the web server. To use this feature pass in the `-w --webpack` argument with a relative path to your config.
 
 ```bash
 netlify-local -w webpack.config.js
