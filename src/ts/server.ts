@@ -38,6 +38,8 @@ export class Server {
   private routeStatic (): void {
     if(this.netlifyConfig.build.publish) {
       this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static));
+    } else {
+      Logger.info("netlify-local: `publish` directory not specified - static server disabled");
     }
   }
 
@@ -85,6 +87,8 @@ export class Server {
   private routeLambdas (): void {
     if(this.netlifyConfig.build.functions) {
       this.express.use("/.netlify/functions/:lambda", this.handleLambda());
+    } else {
+      Logger.info("netlify-local: `functions` directory not specified - lambda server disabled");
     }
   }
 
