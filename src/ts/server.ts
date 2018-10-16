@@ -15,16 +15,15 @@ export class Server {
   private paths: Server.Paths;
 
   constructor(
-    private netlifyConfig: Netlify.Config,
-    private port: number,
+    private options: Server.Options,
   ) {
     this.initialize();
   }
 
   private initialize (): void {
     this.paths = {
-      static: path.join(process.cwd(), String(this.netlifyConfig.build.publish)),
-      lambda: path.join(process.cwd(), String(this.netlifyConfig.build.functions)),
+      static: path.join(process.cwd(), String(this.options.netlifyConfig.build.publish)),
+      lambda: path.join(process.cwd(), String(this.options.netlifyConfig.build.functions)),
     }
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
@@ -36,19 +35,24 @@ export class Server {
   }
 
   private routeStatic (): void {
-    if(this.netlifyConfig.build.publish) {
-      this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static));
-    } else {
-      Logger.info("netlify-local: `publish` directory not specified - static server disabled");
-    }
-  }
-
-  private routeHeaders (): void {
-    if(!this.netlifyConfig.headers) {
+    if(!this.options.routes.static) {
       return
     }
 
-    for(const header of this.netlifyConfig.headers) {
+    if(!this.options.netlifyConfig.build.publish) {
+      throw new Error("cannot find `build.publish` property within toml config");
+    }
+
+    this.express.use(this.options.netlifyConfig.build.base, serveStatic(this.paths.static));
+    Logger.info("netlify-local: static routes initialized");
+  }
+
+  private routeHeaders (): void {
+    if(!this.options.netlifyConfig.headers) {
+      return
+    }
+
+    for(const header of this.options.netlifyConfig.headers) {
       this.handleHeader(header.for, header.values)
     }
   }
@@ -63,11 +67,11 @@ export class Server {
   }
 
   private routeRedirects (): void {
-    if(!this.netlifyConfig.redirects) {
+    if(!this.options.netlifyConfig.redirects) {
       return
     }
 
-    for(const redirect of this.netlifyConfig.redirects) {
+    for(const redirect of this.options.netlifyConfig.redirects) {
       this.handleRedirect(redirect);
     }
   }
@@ -85,11 +89,16 @@ export class Server {
   }
 
   private routeLambdas (): void {
-    if(this.netlifyConfig.build.functions) {
-      this.express.all("/.netlify/functions/:lambda", this.handleLambda());
-    } else {
-      Logger.info("netlify-local: `functions` directory not specified - lambda server disabled");
+    if(!this.options.routes.lambda) {
+      return
     }
+
+    if(!this.options.netlifyConfig.build.functions) {
+      throw new Error("cannot find `build.functions` property within toml config");
+    }
+
+    this.express.all("/.netlify/functions/:lambda", this.handleLambda());
+    Logger.info("netlify-local: lambda routes initialized");
   }
 
   private handleLambda (): express.Handler {
@@ -178,14 +187,14 @@ export class Server {
 
   public listen (): Promise<void> {
     return new Promise(resolve => {
-      this.server = this.express.listen(this.port, (error: Error) => {
+      this.server = this.express.listen(this.options.port, (error: Error) => {
         if (error) {
           Logger.info("netlify-local: unable to start server");
           Logger.error(error);
           process.exit(1);
         }
 
-        Logger.info(`netlify-local: server up on port ${this.port}`);
+        Logger.info(`netlify-local: server up on port ${this.options.port}`);
         return resolve();
       });
     });
@@ -194,7 +203,7 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        Logger.info(`netlify-local: server down on port ${this.port}`);
+        Logger.info(`netlify-local: server down on port ${this.options.port}`);
         resolve();
       });
     });
@@ -202,6 +211,14 @@ export class Server {
 }
 
 export namespace Server {
+  export interface Options {
+    netlifyConfig: Netlify.Config;
+    routes: {
+      static: boolean;
+      lambda: boolean;
+    };
+    port: number;
+  }
   export interface Paths {
     static: string;
     lambda: string;
