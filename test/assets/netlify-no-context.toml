@@ -1,0 +1,5 @@
+[build]
+  base = "build-base"
+  publish = "build-publish"
+  functions = "build-functions"
+  command = "build-command"
