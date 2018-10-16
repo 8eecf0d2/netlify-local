@@ -23,16 +23,22 @@ export class Server {
 
   private initialize (): void {
     this.paths = {
-      static: path.join(process.cwd(), this.netlifyConfig.build.publish),
-      lambda: path.join(process.cwd(), this.netlifyConfig.build.functions),
+      static: path.join(process.cwd(), String(this.netlifyConfig.build.publish)),
+      lambda: path.join(process.cwd(), String(this.netlifyConfig.build.functions)),
     }
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
     this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
     this.routeHeaders();
-    this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
+    this.routeStatic();
     this.routeLambdas();
     this.routeRedirects();
+  }
+
+  private routeStatic (): void {
+    if(this.netlifyConfig.build.publish) {
+      this.express.use(this.netlifyConfig.build.base, serveStatic(this.paths.static))
+    }
   }
 
   private routeHeaders (): void {
@@ -77,7 +83,9 @@ export class Server {
   }
 
   private routeLambdas (): void {
-    this.express.all("/.netlify/functions/:lambda", this.handleLambda());
+    if(this.netlifyConfig.build.functions) {
+      this.express.all("/.netlify/functions/:lambda", this.handleLambda());
+    }
   }
 
   private handleLambda (): express.Handler {
