@@ -7,7 +7,14 @@ process.env.SILENT = "true";
 
 const createServer = async (): Promise<Server>  => {
   const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
-  const server = new Server(netlifyConfig, 9000);
+  const server = new Server({
+    netlifyConfig: netlifyConfig,
+    routes: {
+      static: true,
+      lambda: true,
+    },
+    port: 9000,
+  });
   await server.listen();
 
   return server;
