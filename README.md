@@ -64,7 +64,7 @@ netlify-local serve -w webpack.config.js
 
 ##### `-p --port`
 
-Optionally, you can pick which port the server should bind to by passing in the `-p --port` argument with a number.
+Optionally, you can pick which port the server should bind on by passing in the `-p --port` argument with a number.
 
 ```bash
 netlify-local serve -p 3000
