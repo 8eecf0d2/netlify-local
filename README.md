@@ -23,7 +23,7 @@ yarn add -D netlify-local
 
 ### Commands
 
-#### `serve` command
+#### `serve`
 
 By default **netlify-local** will _try_ and start the **static router** and the **lambda router**.
 
