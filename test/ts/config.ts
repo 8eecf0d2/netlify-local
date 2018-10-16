@@ -21,7 +21,7 @@ mocha.describe('Config', () => {
     mocha.it('should correctly override build with context', () => {
       const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
 
-      assert.equal(netlifyConfig.build.base, "default-base");
+      assert.equal(netlifyConfig.build.base, "build-base");
       assert.equal(netlifyConfig.build.publish, "default-publish");
       assert.equal(netlifyConfig.build.functions, "default-functions");
       assert.equal(netlifyConfig.build.command, "default-command");

@@ -5,7 +5,6 @@
   command = "build-command"
 
 [context.default]
-  base = "default-base"
   publish = "default-publish"
   functions = "default-functions"
   command = "default-command"
