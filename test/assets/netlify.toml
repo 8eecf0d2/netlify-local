@@ -1,8 +1,8 @@
 [build]
-  base = "default-base"
-  publish = "default-publish"
-  functions = "default-functions"
-  command = "default-command"
+  base = "build-base"
+  publish = "build-publish"
+  functions = "build-functions"
+  command = "build-command"
 
 [context.default]
   base = "default-base"
