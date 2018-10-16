@@ -89,5 +89,29 @@ mocha.describe('Server', () => {
 
       server.close();
     });
+
+    mocha.it('should correctly format lambda request', async () => {
+      const requestObj = {
+        path: "/foo",
+        method: "GET",
+        url: "/foo?bar[0]=baz&bar[1]=qak",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: { test: true },
+      }
+
+      //@ts-ignore
+      const lambdaRequest = Server.lambdaRequest(requestObj);
+
+      assert.equal(lambdaRequest.path, "/foo");
+      assert.equal(lambdaRequest.httpMethod, "GET");
+      assert.equal(lambdaRequest.queryStringParameters["bar[0]"], "baz");
+      assert.equal(lambdaRequest.queryStringParameters["bar[1]"], "qak");
+      assert.equal(lambdaRequest.headers["content-type"], "application/json");
+      assert.equal(JSON.stringify(lambdaRequest.body), JSON.stringify({ test: true }));
+      assert.equal(lambdaRequest.isBase64Encoded, false);
+    });
+
   });
 });
