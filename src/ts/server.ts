@@ -59,18 +59,19 @@ export class Server {
     }
 
     for(const redirect of this.netlifyConfig.redirects) {
-      this.handleRedirect(redirect.from, redirect.to, redirect.headers);
+      this.handleRedirect(redirect);
     }
   }
 
-  private handleRedirect(from: string, to: string, headers: { [key: string]: string }): void {
-    this.express.get(from, (request, response, next) => {
-      if(headers) {
-        for(const header in headers) {
-          response.setHeader(header, headers[header]);
+  private handleRedirect(redirect: Netlify.Redirect): void {
+    this.express.get(redirect.from, (request, response, next) => {
+      if(redirect.headers) {
+        for(const header in redirect.headers) {
+          response.setHeader(header, redirect.headers[header]);
         }
       }
-      return response.status(200).sendFile(path.join(this.paths.static, to));
+
+      return response.status(redirect.status || 200).redirect(redirect.to);
     });
   }
 

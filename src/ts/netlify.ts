@@ -13,6 +13,7 @@ export namespace Netlify {
   export interface Redirect {
     from: string;
     to: string;
+    status?: number;
     headers?: {
       [key: string]: string;
     };
