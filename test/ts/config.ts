@@ -8,10 +8,10 @@ process.env.NETLIFY_LOCAL_BRANCH = "default"
 mocha.describe('Config', () => {
   mocha.describe('parseNetlifyConfig', () => {
     mocha.it('should throw when not found', () => {
-      assert.throws(() => parseNetlifyConfig("test/toml/netlify.toml" + Math.random()));
+      assert.throws(() => parseNetlifyConfig("test/assets/netlify.toml" + Math.random()));
     });
     mocha.it('should override build with context', () => {
-      const netlifyConfig = parseNetlifyConfig("test/toml/netlify.toml");
+      const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
 
       assert.equal(netlifyConfig.build.base, "default-base");
       assert.equal(netlifyConfig.build.publish, "default-publish");
@@ -21,10 +21,10 @@ mocha.describe('Config', () => {
   });
   mocha.describe('parseWebpackConfig', () => {
     mocha.it('should throw when not found', () => {
-      assert.throws(() => parseWebpackConfig("test/js/webpack.config.js" + Math.random()));
+      assert.throws(() => parseWebpackConfig("test/assets/webpack.config.js" + Math.random()));
     });
     mocha.it('should correctly import webpack config', () => {
-      const webpackConfig = parseWebpackConfig("test/js/webpack.config.js");
+      const webpackConfig = parseWebpackConfig("test/assets/webpack.config.js");
 
       assert.equal(webpackConfig.target, "node");
     });
