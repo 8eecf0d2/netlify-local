@@ -23,22 +23,26 @@ yarn add -D netlify-local
 
 ### Usage
 
+#### `serve` command
+
+By default `netlify-local` will _try_ and start the **static server** and the **lambda server** which use the `publish` and `functions` property respectively from your `netlify.toml`.
+
 ```bash
-netlify-local -n netlify.toml -w webpack.config.js
+netlify-local serve
 ```
 
-### Options
+If your `netlify.toml` is not in the current directory you can pass in the `-n --netlify` argument with a relative path to the configuration file.
+
 ```bash
-Usage: netlify-local [options]
+netlify-local app-functions/netlify.toml
+```
 
-Locally emulate Netlify services
+You can prevent the **static server** or **lambda server** from starting by passing in the `-s --static` or `-l --lambda` arguments respectively with the value `false`.
 
-Options:
-  -V, --version        output the version number
-  -n --netlify <path>  path to `netlify.toml` file (default `./netlify.toml`)
-  -w --webpack <path>  path to webpack config file (default `./webpack.config.js`)
-  -p --port <port>     port to serve from (default: 9000)
-  -h, --help           output usage information
+```bash
+netlify-local -s false
+netlify-local -l false
+netlify-local -s false -l false
 ```
 
 ### API
