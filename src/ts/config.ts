@@ -7,10 +7,10 @@ import { Netlify } from "./netlify";
 import { Webpack } from "./webpack";
 
 export const parseWebpackConfig = (filename: string): Webpack.Config => {
-  const webpackConfigExists = fs.existsSync(path.join(process.cwd(), filename));
+  const webpackConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
 
   if(!webpackConfigExists) {
-    throw new Error(`Could not locate "${filename}" file.`);
+    throw new Error(`cannot find webpack configuration file "${filename}"`);
   }
 
   const webpackConfig = require(path.join(process.cwd(), filename));
@@ -19,13 +19,12 @@ export const parseWebpackConfig = (filename: string): Webpack.Config => {
 }
 
 export const parseNetlifyConfig = (filename: string): Netlify.Config => {
-  const netlifyFileOption = filename;
-  const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), netlifyFileOption));
+  const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
   if(!netlifyConfigExists) {
-    throw new Error(`Could not locate "${netlifyFileOption}" file.`);
+    throw new Error(`cannot find netlify configuration file "${filename}"`);
   }
 
-  const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), netlifyFileOption), "utf8"));
+  const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8"));
   const currentBranch = process.env.NETLIFY_LOCAL_BRANCH || gitBranch.sync();
 
   if(netlifyConfig.context && netlifyConfig.context[currentBranch]) {
