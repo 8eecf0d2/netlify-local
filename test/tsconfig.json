@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": true,
+    "lib": [ "ES2015", "ES2017" ]
+  },
+  "include": [ "ts/**/*.ts" ],
+  "exclude": [ "node_modules" ]
+}
