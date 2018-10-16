@@ -19,11 +19,11 @@ program
   .option("-l --lambda [boolean]", "start the lambda server (default: true)")
   .option("-n --netlify <path>", "path to netlify toml config file")
   .option("-w --webpack <path>", "path to webpack config file")
+  .option("-p --port <port>", "port to serve from (default: 9000)");
 
 program
   .command("serve")
   .description("Locally emulate Netlify services")
-  .option("-p --port <port>", "port to serve from (default: 9000)")
   .action(() => {
     (async () => {
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
