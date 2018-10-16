@@ -6,24 +6,20 @@ import * as gitBranch from "git-branch";
 import { Netlify } from "./netlify";
 import { Webpack } from "./webpack";
 
-export const parseWebpackConfig = (filename: string): Webpack.Config | false => {
-  const webpackFileOption = filename || "webpack.config.js";
-  const webpackConfigExists = fs.existsSync(path.join(process.cwd(), webpackFileOption));
-  if(!webpackConfigExists && filename) {
-    throw new Error(`Could not locate "${webpackFileOption}" file.`);
+export const parseWebpackConfig = (filename: string): Webpack.Config => {
+  const webpackConfigExists = fs.existsSync(path.join(process.cwd(), filename));
+
+  if(!webpackConfigExists) {
+    throw new Error(`Could not locate "${filename}" file.`);
   }
 
-  if(webpackConfigExists) {
-    const webpackConfig = require(path.join(process.cwd(), webpackFileOption));
+  const webpackConfig = require(path.join(process.cwd(), filename));
 
-    return webpackConfig;
-  }
-
-  return false;
+  return webpackConfig;
 }
 
 export const parseNetlifyConfig = (filename: string): Netlify.Config => {
-  const netlifyFileOption = filename || "netlify.toml";
+  const netlifyFileOption = filename;
   const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), netlifyFileOption));
   if(!netlifyConfigExists) {
     throw new Error(`Could not locate "${netlifyFileOption}" file.`);
