@@ -54,7 +54,7 @@ export class Server {
   }
 
   private handleHeader (path: string, headers: { [key: string]: string }): void {
-    this.express.use(path, (request, response, next) => {
+    this.express.all(path, (request, response, next) => {
       for(const header in headers) {
         response.setHeader(header, headers[header]);
       }
@@ -73,7 +73,7 @@ export class Server {
   }
 
   private handleRedirect(redirect: Netlify.Redirect): void {
-    this.express.use(redirect.from, (request, response, next) => {
+    this.express.all(redirect.from, (request, response, next) => {
       if(redirect.headers) {
         for(const header in redirect.headers) {
           response.setHeader(header, redirect.headers[header]);
@@ -86,7 +86,7 @@ export class Server {
 
   private routeLambdas (): void {
     if(this.netlifyConfig.build.functions) {
-      this.express.use("/.netlify/functions/:lambda", this.handleLambda());
+      this.express.all("/.netlify/functions/:lambda", this.handleLambda());
     } else {
       Logger.info("netlify-local: `functions` directory not specified - lambda server disabled");
     }
