@@ -43,7 +43,7 @@ netlify-local serve
 You can prevent the **static router** or **lambda router** from being initialized by passing in the `-s --static` or `-l --lambda` with the value `false`.
 
 ```bash
-netlify-local -s false -l false
+netlify-local serve -s false -l false
 ```
 
 ##### `-n --netlify`
@@ -51,15 +51,23 @@ netlify-local -s false -l false
 If your `netlify.toml` is not in the current directory you can pass in the `-n --netlify` argument with a relative path to the configuration file.
 
 ```bash
-netlify-local -n app-functions/netlify.toml
+netlify-local serve -n app-functions/netlify.toml
 ```
 
 ##### `-w --webpack`
 
-Optionally, **netlify-local** can run a Webpack watcher and rebuild your source files as you develop without the need to start and stop the web server. To use this feature pass in the `-w --webpack` option with a relative path to your config.
+Optionally, **netlify-local** can run a Webpack watcher and rebuild your source files as you develop without the need to start and stop the web server. To use this feature pass in the `-w --webpack` argument with a relative path to your config.
 
 ```bash
-netlify-local -w webpack.config.js
+netlify-local serve -w webpack.config.js
+```
+
+##### `-p --port`
+
+Optionally, you can pick which port the server should bind to by passing in the `-p --port` argument with a number.
+
+```bash
+netlify-local serve -p 3000
 ```
 
 ### API
