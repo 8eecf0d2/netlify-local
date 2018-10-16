@@ -6,9 +6,9 @@ export namespace Netlify {
       functions: string;
       command: string;
     }
-    context: any;
-    redirects: Netlify.Redirect[];
-    headers: Netlify.Headers[];
+    context?: any;
+    redirects?: Netlify.Redirect[];
+    headers?: Netlify.Headers[];
   }
   export interface Redirect {
     from: string;
