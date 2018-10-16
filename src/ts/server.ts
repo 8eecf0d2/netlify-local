@@ -6,6 +6,7 @@ import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
 import * as http from "http";
 
+import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 
 export class Server {
@@ -81,7 +82,7 @@ export class Server {
 
   private handleLambda (): express.Handler {
     return (request, response, next) => {
-      console.log(`netlify-local: lambda invoked "${request.params.lambda}"`);
+      Logger.info(`netlify-local: lambda invoked "${request.params.lambda}"`);
 
       const module = path.join(this.paths.lambda, request.params.lambda);
 
@@ -167,12 +168,12 @@ export class Server {
     return new Promise(resolve => {
       this.server = this.express.listen(this.port, (error: Error) => {
         if (error) {
-          console.log("netlify-local: unable to start server");
-          console.error(error);
+          Logger.info("netlify-local: unable to start server");
+          Logger.error(error);
           process.exit(1);
         }
 
-        console.log(`netlify-local: server up on port ${this.port}`);
+        Logger.info(`netlify-local: server up on port ${this.port}`);
         return resolve();
       });
     });
@@ -181,7 +182,7 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        console.log(`netlify-local: server down on port ${this.port}`);
+        Logger.info(`netlify-local: server down on port ${this.port}`);
         resolve();
       });
     });

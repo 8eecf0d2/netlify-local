@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as program from "commander";
 
+import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
 import { Webpack } from "./webpack";
@@ -15,27 +16,26 @@ program.version(packageJson.version);
 
 program
   .option("-n --netlify <path>", "path to `netlify.toml` file (default `./netlify.toml`)")
-  .option("-w --webpack <path>", "path to webpack config file (default `./webpack.config.js`)")
+  .option("-w --webpack [path]", "path to webpack config file (default `./webpack.config.js`)")
   .option("-p --port <port>", "port to serve from (default: 9000)")
 
 program
   .description("Locally emulate Netlify services")
   .action(() => {
     (async () => {
-      const netlifyConfig = parseNetlifyConfig(program.netlify);
-      const webpackConfig = parseWebpackConfig(program.webpack);
-
+      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
       const server = new Server(netlifyConfig, program.port || 9000);
-
       await server.listen();
 
-      if(webpackConfig) {
+      if(program.webpack === true || program.webpack) {
+        const webpackFilename = program.webpack === true ? "webpack.config.js" : program.webpack;
+        const webpackConfig = parseWebpackConfig(webpackFilename);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
     })()
       .catch(error => {
-        console.log(error)
+        Logger.info(error)
         process.exit(1);
       })
   });

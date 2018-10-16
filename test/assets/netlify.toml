@@ -9,9 +9,3 @@
   publish = "default-publish"
   functions = "default-functions"
   command = "default-command"
-
-[context.develop]
-  base = "develop-base"
-  publish = "develop-publish"
-  functions = "develop-functions"
-  command = "develop-command"
