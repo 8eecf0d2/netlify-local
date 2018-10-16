@@ -1,14 +1,14 @@
 export class Logger {
-  static silent = () => process.env.SILENT === "true";
+  static active = () => !(process.env.SILENT === "true");
 
   public static info (...args: any[]): void {
-    if(!Logger.silent()) {
+    if(Logger.active()) {
       console.log(...args);
     }
   }
 
   public static error (...args: any[]): void {
-    if(!Logger.silent()) {
+    if(Logger.active()) {
       console.error(...args);
     }
   }
