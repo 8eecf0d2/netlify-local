@@ -5,13 +5,18 @@ import { parseNetlifyConfig, Server } from "../../src/ts";
 
 process.env.SILENT = "true";
 
+const createServer = async (): Promise<Server>  => {
+  const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
+  const server = new Server(netlifyConfig, 9000);
+  await server.listen();
+
+  return server;
+}
+
 mocha.describe('Server', () => {
   mocha.describe('lifecycle', () => {
     mocha.it('should listen and close', async () => {
-      const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
-
-      const server = new Server(netlifyConfig, 9000);
-      await server.listen();
+      const server = await createServer();
 
       //@ts-ignore
       assert.notEqual(server.server.address(), null);
@@ -23,10 +28,7 @@ mocha.describe('Server', () => {
     });
 
     mocha.it('should add redirect routes', async () => {
-      const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
-
-      const server = new Server(netlifyConfig, 9000);
-      await server.listen();
+      const server = await createServer();
 
       const [redirectRouteA, redirectRouteB] = [
         //@ts-ignore
@@ -43,10 +45,7 @@ mocha.describe('Server', () => {
     });
 
     mocha.it('should add redirect header routes', async () => {
-      const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
-
-      const server = new Server(netlifyConfig, 9000);
-      await server.listen();
+      const server = await createServer();
 
       //@ts-ignore
       const redirectRouteHeader = server.express._router.stack.find(route => route.route && route.route.path === "/redirect-from-header");
@@ -57,10 +56,7 @@ mocha.describe('Server', () => {
     });
 
     mocha.it('should add header routes', async () => {
-      const netlifyConfig = parseNetlifyConfig("test/assets/netlify.toml");
-
-      const server = new Server(netlifyConfig, 9000);
-      await server.listen();
+      const server = await createServer();
 
       const [headerRouteA, headerRouteB] = [
         //@ts-ignore
