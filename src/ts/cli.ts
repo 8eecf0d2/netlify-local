@@ -15,24 +15,36 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "packa
 program.version(packageJson.version);
 
 program
-  .option("-n --netlify <path>", "path to `netlify.toml` file (default `./netlify.toml`)")
-  .option("-w --webpack [path]", "path to webpack config file (default `./webpack.config.js`)")
-  .option("-p --port <port>", "port to serve from (default: 9000)")
+  .option("-s --static [boolean]", "start the static server (default: true)")
+  .option("-l --lambda [boolean]", "start the lambda server (default: true)")
+  .option("-n --netlify <path>", "path to netlify toml config file")
+  .option("-w --webpack <path>", "path to webpack config file")
 
 program
+  .command("serve")
   .description("Locally emulate Netlify services")
+  .option("-p --port <port>", "port to serve from (default: 9000)")
   .action(() => {
     (async () => {
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
-      const server = new Server(netlifyConfig, program.port || 9000);
+
+      const server = new Server({
+        netlifyConfig: netlifyConfig,
+        routes: {
+          static: (program.static === "false" ? false : true),
+          lambda: (program.lambda === "false" ? false : true),
+        },
+        port: program.port || 9000
+      });
+
       await server.listen();
 
-      if(program.webpack === true || program.webpack) {
-        const webpackFilename = program.webpack === true ? "webpack.config.js" : program.webpack;
-        const webpackConfig = parseWebpackConfig(webpackFilename);
+      if(Boolean(program.webpack)) {
+        const webpackConfig = parseWebpackConfig(program.webpack);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
+
     })()
       .catch(error => {
         Logger.info(error)

@@ -21,29 +21,42 @@ You should probably install as a dev dependency, but globally works too.
 yarn add -D netlify-local
 ```
 
-### Usage
+### Commands
+
+#### `serve` command
+
+By default **netlify-local** will _try_ and start the **static router** and the **lambda router**.
 
 ```bash
-netlify-local -n netlify.toml -w webpack.config.js
+netlify-local serve
 ```
 
-### Options
+##### `-s --static, -l --lambda`
+You can prevent the **static router** or **lambda router** from being initialized by passing in the `-s --static` or `-l --lambda` with the value `false`.
+
 ```bash
-Usage: netlify-local [options]
+netlify-local -s false -l false
+```
 
-Locally emulate Netlify services
+##### `-n --netlify`
 
-Options:
-  -V, --version        output the version number
-  -n --netlify <path>  path to `netlify.toml` file (default `./netlify.toml`)
-  -w --webpack <path>  path to webpack config file (default `./webpack.config.js`)
-  -p --port <port>     port to serve from (default: 9000)
-  -h, --help           output usage information
+If your `netlify.toml` is not in the current directory you can pass in the `-n --netlify` argument with a relative path to the configuration file.
+
+```bash
+netlify-local -n app-functions/netlify.toml
+```
+
+##### `-w --webpack`
+
+Optionally, **netlify-local** can run a Webpack watcher and rebuild your source files as you develop without the need to start and stop the web server. To use this feature pass in the `-w --webpack` option with a relative path to your config.
+
+```bash
+netlify-local -w webpack.config.js
 ```
 
 ### API
 
-Specific classes and methods are exposed for running `netlify-local` programmatically, see [Issue #6](https://github.com/8eecf0d2/netlify-local/issues/6) for more information and documentation.
+Specific classes and methods are exposed for running **netlify-local** programmatically, see [Issue #6](https://github.com/8eecf0d2/netlify-local/issues/6) for more information and documentation.
 
 ### Typings
 
