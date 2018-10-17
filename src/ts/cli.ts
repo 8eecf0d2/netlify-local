@@ -19,6 +19,7 @@ program
   .option("-l --lambda [boolean]", "start the lambda server (default: true)")
   .option("-n --netlify <path>", "path to netlify toml config file")
   .option("-w --webpack <path>", "path to webpack config file")
+  .option("-c --context <context>", "override context (default: current git branch)")
   .option("-p --port <port>", "port to serve from (default: 9000)");
 
 program
@@ -26,6 +27,10 @@ program
   .description("Locally emulate Netlify services")
   .action(() => {
     (async () => {
+      if(program.context) {
+        process.env.NETLIFY_LOCAL_CONTEXT = program.context;
+      }
+
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
 
       const server = new Server({
