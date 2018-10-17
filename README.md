@@ -56,7 +56,7 @@ netlify-local serve -s false -l false
 The [deploy context](https://www.netlify.com/docs/netlify-toml-reference#deploy-context) will be derived from the currently checked out git branch, you can pass in the `-c --context` argument to override this value.
 
 ```bash
-netlify-local serve -c false -l false
+netlify-local serve -c foo-branch
 ```
 
 ##### `-n --netlify`
