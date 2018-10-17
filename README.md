@@ -6,9 +6,9 @@
 
 Local Netlify service emulation.
 
-**Experimental:** This package has not been heavily tested or used, some of the Netlify Services might be incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
+**Experimental:** This package has not been heavily tested or used, some of the Netlify Services are incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
 
-**Semver Notice:** Breaking changes which increase compatibility with Netlify Services are not considered breaking 🤷‍♂️
+**Semver Notice:** Breaking changes which increase compatibility with Netlify services and features are not considered breaking 🤷‍♂️
 
 For help bundling your Javascript to work with Netlify Functions, checkout [8eecf0d2/webpack-netlify-lambda-plugin](https://github.com/8eecf0d2/webpack-netlify-lambda-plugin) or [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
 
