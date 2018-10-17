@@ -113,5 +113,29 @@ mocha.describe('Server', () => {
       assert.equal(lambdaRequest.isBase64Encoded, false);
     });
 
+    mocha.it('should correctly format lambda context', async () => {
+      const requestWithoutBearer = {
+        headers: {}
+      }
+
+      //@ts-ignore
+      const lambdaContextWithoutBearer = Server.lambdaContext(requestWithoutBearer);
+
+      assert.equal(JSON.stringify(lambdaContextWithoutBearer), JSON.stringify({}));
+
+      const requestWithBearer = {
+        headers: {
+          "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmb28iOiJiYXIifQ._NaFhGu8tCCgBKksGBA6ADwRdKx3e9GES_KyF4A5phE"
+        }
+      }
+
+      //@ts-ignore
+      const lambdaContextWithBearer = Server.lambdaContext(requestWithBearer);
+
+      assert.equal(lambdaContextWithBearer.identity.url, "");
+      assert.equal(lambdaContextWithBearer.identity.token, "");
+      assert.equal(JSON.stringify(lambdaContextWithBearer.user), JSON.stringify({ foo: "bar" }));
+    });
+
   });
 });
