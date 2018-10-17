@@ -29,6 +29,7 @@ export class Server {
     this.express.use(bodyParser.raw({ limit: "6mb" }));
     this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
     this.routeHeaders();
+    this.routeForcedRedirects();
     this.routeStatic();
     this.routeLambdas();
     this.routeRedirects();
@@ -64,6 +65,18 @@ export class Server {
       }
       next();
     })
+  }
+
+  private routeForcedRedirects (): void {
+    if(!this.options.netlifyConfig.redirects) {
+      return
+    }
+
+    const forcedRedirects = this.options.netlifyConfig.redirects.filter(redirect => redirect.force === true);
+
+    for(const redirect of forcedRedirects) {
+      this.handleRedirect(redirect);
+    }
   }
 
   private routeRedirects (): void {
