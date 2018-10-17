@@ -25,12 +25,12 @@ export const parseNetlifyConfig = (filename: string): Netlify.Config => {
   }
 
   const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8"));
-  const currentBranch = process.env.NETLIFY_LOCAL_BRANCH || gitBranch.sync();
+  const context = process.env.NETLIFY_LOCAL_CONTEXT || gitBranch.sync();
 
-  if(netlifyConfig.context && netlifyConfig.context[currentBranch]) {
+  if(netlifyConfig.context && netlifyConfig.context[context]) {
     netlifyConfig.build = {
       ...netlifyConfig.build,
-      ...netlifyConfig.context[currentBranch],
+      ...netlifyConfig.context[context],
     }
   }
 
