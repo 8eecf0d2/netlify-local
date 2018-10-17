@@ -24,10 +24,16 @@ yarn add -D netlify-local
 ### Features
 
 #### Static Router
-The **static router** refers to the [Netlify Continuous Deployment](https://www.netlify.com/docs/continuous-deployment) feature which serves files from the `build.publish` directory, specified within the toml configuration.
+The **static router** refers to the static server functionality of [Netlify Continuous Deployment](https://www.netlify.com/docs/continuous-deployment), which serves files from the `build.publish` directory, specified within the toml configuration.
 
 #### Lambda Router
 The **lambda router** refers to the [Netlify Functions](https://www.netlify.com/features/functions) feature which serves Lambda's or Cloud Functions from the `build.functions` directory, specified within the toml configuration.
+
+#### Redirects
+This feature refers to [Netlify Redirects](https://www.netlify.com/docs/netlify-toml-reference#redirects), this has not been correctly implemented and is missing a lot of functionality, see [Issue #8](https://github.com/8eecf0d2/netlify-local/issues/8) for progress.
+
+#### Headers
+This feature refers to [Netlify Headers](https://www.netlify.com/docs/netlify-toml-reference#headers), for the most part this works as expected however the [Netlify Basic Auth](https://www.netlify.com/docs/headers-and-basic-auth/#basic-auth) portion is not supported.
 
 ### Commands
 
