@@ -25,13 +25,19 @@ export class Server {
       static: path.join(process.cwd(), String(this.options.netlifyConfig.build.publish)),
       lambda: path.join(process.cwd(), String(this.options.netlifyConfig.build.functions)),
     }
+
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
     this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
-    this.routeHeaders();
+
+    const hardRedirects = this.options.netlifyConfig.redirects.filter(redirect => redirect.force === true);
+    const softRedirects = this.options.netlifyConfig.redirects.filter(redirect => redirect.force === false);
+
+    this.routeHeaders(this.options.netlifyConfig.headers);
+    this.routeRedirects(hardRedirects);
     this.routeStatic();
-    this.routeLambdas();
-    this.routeRedirects();
+    this.routeLambda();
+    this.routeRedirects(softRedirects);
   }
 
   private routeStatic (): void {
@@ -47,12 +53,8 @@ export class Server {
     Logger.info("netlify-local: static routes initialized");
   }
 
-  private routeHeaders (): void {
-    if(!this.options.netlifyConfig.headers) {
-      return
-    }
-
-    for(const header of this.options.netlifyConfig.headers) {
+  private routeHeaders (headers: Netlify.Headers[]): void {
+    for(const header of headers) {
       this.handleHeader(header.for, header.values)
     }
   }
@@ -66,29 +68,41 @@ export class Server {
     })
   }
 
-  private routeRedirects (): void {
-    if(!this.options.netlifyConfig.redirects) {
-      return
-    }
-
-    for(const redirect of this.options.netlifyConfig.redirects) {
-      this.handleRedirect(redirect);
+  private routeRedirects (redirects: Netlify.Redirect[]): void {
+    for(const redirect of redirects) {
+      if([301, 302, 303].includes(redirect.status)) {
+        this.handleRedirect(redirect);
+      } else {
+        this.handleRewrite(redirect)
+      }
     }
   }
 
-  private handleRedirect(redirect: Netlify.Redirect): void {
+  private handleRedirect (redirect: Netlify.Redirect): void {
     this.express.all(redirect.from, (request, response, next) => {
-      if(redirect.headers) {
-        for(const header in redirect.headers) {
-          response.setHeader(header, redirect.headers[header]);
-        }
-      }
+      this.handleRedirectHeaders(response, redirect);
 
-      return response.status(redirect.status || 200).redirect(redirect.to);
+      return response.status(redirect.status).redirect(redirect.to);
+    })
+  }
+
+  private handleRewrite (redirect: Netlify.Redirect): void {
+    this.express.all(redirect.from, (request, response, next) => {
+      this.handleRedirectHeaders(response, redirect);
+
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, redirect.to));
     });
   }
 
-  private routeLambdas (): void {
+  private handleRedirectHeaders (response: express.Response, redirect: Netlify.Redirect): void {
+    if(redirect.headers) {
+      for(const header in redirect.headers) {
+        response.setHeader(header, redirect.headers[header]);
+      }
+    }
+  }
+
+  private routeLambda (): void {
     if(!this.options.routes.lambda) {
       return
     }

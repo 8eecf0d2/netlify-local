@@ -6,11 +6,11 @@
 
 Local Netlify service emulation.
 
-**Experimental:** This package has not been heavily tested or used, some of the Netlify Services might be incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
+**Experimental:** This package has not been heavily tested or used, some of the Netlify Services are incorrectly implemented. [Submit an issue](https://github.com/8eecf0d2/netlify-local/issues) if you find any!
 
-**Semver Notice:** Breaking changes which increase compatibility with Netlify Services are not considered breaking 🤷‍♂️
+**Semver Notice:** Breaking changes which increase compatibility with Netlify services and features are not considered breaking 🤷‍♂️
 
-For help bundling your Javascript to work with Netlify Functions, checkout [8eecf0d2/webpack-netlify-lambda-plugin](https://github.com/8eecf0d2/webpack-netlify-lambda-plugin) or [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda).
+For help bundling your Javascript to work with Netlify Functions, checkout [netlify/netlify-lambda](https://github.com/netlify/netlify-lambda) or [8eecf0d2/webpack-netlify-lambda-plugin](https://github.com/8eecf0d2/webpack-netlify-lambda-plugin).
 
 An example Netlify deployable application is available at [8eecf0d2/netlify-local-example](https://github.com/8eecf0d2/netlify-local-example).
 
@@ -24,10 +24,16 @@ yarn add -D netlify-local
 ### Features
 
 #### Static Router
-The **static router** refers to the [Netlify Continuous Deployment](https://www.netlify.com/docs/continuous-deployment) feature which serves files from the `build.publish` directory, specified within the toml configuration.
+The **static router** refers to the static server functionality of [Netlify Continuous Deployment](https://www.netlify.com/docs/continuous-deployment), which serves files from the `build.publish` directory, specified within the toml configuration.
 
 #### Lambda Router
 The **lambda router** refers to the [Netlify Functions](https://www.netlify.com/features/functions) feature which serves Lambda's or Cloud Functions from the `build.functions` directory, specified within the toml configuration.
+
+#### Redirects
+This feature refers to [Netlify Redirects](https://www.netlify.com/docs/netlify-toml-reference#redirects), this has not been correctly implemented and is missing a lot of functionality, see [Issue #8](https://github.com/8eecf0d2/netlify-local/issues/8) for progress.
+
+#### Headers
+This feature refers to [Netlify Headers](https://www.netlify.com/docs/netlify-toml-reference#headers), for the most part this works as expected however the [Netlify Basic Auth](https://www.netlify.com/docs/headers-and-basic-auth/#basic-auth) portion is not supported.
 
 ### Commands
 
