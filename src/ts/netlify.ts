@@ -5,6 +5,9 @@ export namespace Netlify {
       publish: string;
       functions: string;
       command: string;
+      environment?: {
+        [key: string]: string;
+      };
     }
     context?: any;
     redirects?: Netlify.Redirect[];
@@ -14,6 +17,7 @@ export namespace Netlify {
     from: string;
     to: string;
     status?: number;
+    force?: boolean;
     headers?: {
       [key: string]: string;
     };

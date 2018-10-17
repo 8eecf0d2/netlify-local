@@ -24,7 +24,7 @@ export const parseNetlifyConfig = (filename: string): Netlify.Config => {
     throw new Error(`cannot find netlify configuration file "${filename}"`);
   }
 
-  const netlifyConfig = toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8"));
+  const netlifyConfig: Netlify.Config = toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8"));
   const context = process.env.NETLIFY_LOCAL_CONTEXT || gitBranch.sync();
 
   if(netlifyConfig.context && netlifyConfig.context[context]) {
