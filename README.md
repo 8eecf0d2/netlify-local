@@ -46,6 +46,13 @@ You can prevent the **static router** or **lambda router** from being initialize
 netlify-local serve -s false -l false
 ```
 
+##### `-c --context`
+The [deploy context](https://www.netlify.com/docs/netlify-toml-reference#deploy-context) will be derived from the currently checked out git branch, you can pass in the `-c --context` argument to override this value.
+
+```bash
+netlify-local serve -c false -l false
+```
+
 ##### `-n --netlify`
 
 If your `netlify.toml` is not in the current directory you can pass in the `-n --netlify` argument with a relative path to the configuration file.
