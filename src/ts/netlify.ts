@@ -10,8 +10,8 @@ export namespace Netlify {
       };
     }
     context?: any;
-    redirects?: Netlify.Redirect[];
-    headers?: Netlify.Headers[];
+    redirects: Netlify.Redirect[];
+    headers: Netlify.Headers[];
   }
   export interface Redirect {
     from: string;
