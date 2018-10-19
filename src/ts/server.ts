@@ -89,33 +89,33 @@ export class Server {
   }
 
   private handleRedirect (redirect: Netlify.Redirect): void {
+    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
     this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
+      const params = Server.redirectPlaceholderParams(request);
 
       return response.status(redirect.status).redirect(redirect.to);
     })
   }
 
   private handleRewrite (redirect: Netlify.Redirect): void {
+    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
     this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
+      const params = Server.redirectPlaceholderParams(request);
 
-      return response.status(redirect.status).sendFile(path.join(this.paths.static, redirect.to));
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(params)));
     });
   }
 
   private handleProxy (redirect: Netlify.Redirect) {
-    const redirectUrl = new URL(redirect.to);
-    const redirectPattern = new UrlPattern(redirectUrl.pathname);
+    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
 
     this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
-      const params = {
-        splat: request.params["0"],
-        ...request.params,
-      }
-      expressHttpProxy(redirectUrl.origin, {
-        proxyReqPathResolver: (proxyRequest: express.Request) => {
-          return redirectPattern.stringify(params);
-        }
+      const params = Server.redirectPlaceholderParams(request);
+
+      expressHttpProxy(placeholderOptions.url.origin, {
+        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(params),
       })(request, response, next);
+
     });
   }
 
@@ -127,6 +127,30 @@ export class Server {
         }
       }
       next();
+    }
+  }
+
+  static redirectPlaceholderOptions (redirect: Netlify.Redirect) {
+    let redirectUrl: URL;
+
+    if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
+      redirectUrl = new URL(redirect.to);
+    } else {
+      redirectUrl = new URL("http://localhost");
+    }
+
+    const redirectPattern = new UrlPattern(redirectUrl.pathname);
+
+    return {
+      url: redirectUrl,
+      pattern: redirectPattern,
+    }
+  }
+
+  static redirectPlaceholderParams (request: express.Request): { [key: string]: string } {
+    return {
+      splat: request.params["0"],
+      ...request.params,
     }
   }
 
