@@ -114,10 +114,9 @@ export class Server {
 
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      expressHttpProxy(placeholderOptions.url.origin, {
+      return expressHttpProxy(placeholderOptions.url.origin, {
         proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(request.params),
       })(request, response, next);
-
     });
   }
 
