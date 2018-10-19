@@ -5,6 +5,10 @@ import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
 import * as http from "http";
+import { URL } from "url";
+import * as UrlPattern from "url-pattern";
+//@ts-ignore
+import * as expressHttpProxy from "express-http-proxy";
 
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
@@ -70,11 +74,17 @@ export class Server {
 
   private routeRedirects (redirects: Netlify.Redirect[]): void {
     for(const redirect of redirects) {
+      // XXX: Need to check if this can be made stricter to just match "http" and "https"
+      if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
+        this.handleProxy(redirect);
+        continue;
+      }
       if([301, 302, 303].includes(redirect.status)) {
         this.handleRedirect(redirect);
-      } else {
-        this.handleRewrite(redirect)
+        continue;
       }
+
+      this.handleRewrite(redirect);
     }
   }
 
@@ -89,6 +99,23 @@ export class Server {
     this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
 
       return response.status(redirect.status).sendFile(path.join(this.paths.static, redirect.to));
+    });
+  }
+
+  private handleProxy (redirect: Netlify.Redirect) {
+    const redirectUrl = new URL(redirect.to);
+    const redirectPattern = new UrlPattern(redirectUrl.pathname);
+
+    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
+      const params = {
+        splat: request.params["0"],
+        ...request.params,
+      }
+      expressHttpProxy(redirectUrl.origin, {
+        proxyReqPathResolver: (proxyRequest: express.Request) => {
+          return redirectPattern.stringify(params);
+        }
+      })(request, response, next);
     });
   }
 
