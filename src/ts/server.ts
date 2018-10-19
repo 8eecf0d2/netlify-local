@@ -75,15 +75,20 @@ export class Server {
   private routeRedirects (redirects: Netlify.Redirect[]): void {
     for(const redirect of redirects) {
       // XXX: Need to check if this can be made stricter to just match "http" and "https"
+
+      /** Routes which have an absolute urls will be proxied */
       if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
         this.handleProxy(redirect);
         continue;
       }
+
+      /** Routes which have a 301, 302 or 303 status code are considered typical redirects */
       if([301, 302, 303].includes(redirect.status)) {
         this.handleRedirect(redirect);
         continue;
       }
 
+      /** Routes which do not match other conditions are assumed to be rewrites */
       this.handleRewrite(redirect);
     }
   }
