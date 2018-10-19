@@ -89,48 +89,34 @@ export class Server {
   }
 
   private handleRedirect (redirect: Netlify.Redirect): void {
-    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
-    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
-      const params = Server.redirectPlaceholderParams(request);
+    const placeholderOptions = Server.placeholderOptions(redirect);
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).redirect(redirect.to);
+      return response.status(redirect.status).redirect(placeholderOptions.pattern.stringify(request.params));
     })
   }
 
   private handleRewrite (redirect: Netlify.Redirect): void {
-    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
-    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
-      const params = Server.redirectPlaceholderParams(request);
+    const placeholderOptions = Server.placeholderOptions(redirect);
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(params)));
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(request.params)));
     });
   }
 
   private handleProxy (redirect: Netlify.Redirect) {
-    const placeholderOptions = Server.redirectPlaceholderOptions(redirect);
+    const placeholderOptions = Server.placeholderOptions(redirect);
 
-    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
-      const params = Server.redirectPlaceholderParams(request);
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
       expressHttpProxy(placeholderOptions.url.origin, {
-        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(params),
+        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(request.params),
       })(request, response, next);
 
     });
   }
 
-  private handleRedirectHeaders (redirect: Netlify.Redirect): express.Handler {
-    return (request, response, next) => {
-      if(redirect.headers) {
-        for(const header in redirect.headers) {
-          response.setHeader(header, redirect.headers[header]);
-        }
-      }
-      next();
-    }
-  }
-
-  static redirectPlaceholderOptions (redirect: Netlify.Redirect) {
+  private static placeholderOptions (redirect: Netlify.Redirect) {
     let redirectUrl: URL;
 
     if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
@@ -147,10 +133,25 @@ export class Server {
     }
   }
 
-  static redirectPlaceholderParams (request: express.Request): { [key: string]: string } {
-    return {
-      splat: request.params["0"],
-      ...request.params,
+  private static redirectHeadersMiddleware (redirect: Netlify.Redirect): express.Handler {
+    return (request, response, next) => {
+      if(redirect.headers) {
+        for(const header in redirect.headers) {
+          response.setHeader(header, redirect.headers[header]);
+        }
+      }
+      next();
+    }
+  }
+
+  private static placeholderParamsMiddleware (): express.Handler {
+    return (request, response, next) => {
+      request.params = {
+        splat: request.params["0"],
+        ...request.params,
+      }
+
+      next();
     }
   }
 
