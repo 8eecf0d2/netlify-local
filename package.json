@@ -35,9 +35,11 @@
     "body-parser": "^1.18.3",
     "commander": "^2.19.0",
     "express": "^4.16.4",
+    "express-http-proxy": "^1.4.0",
     "git-branch": "^2.0.1",
     "jsonwebtoken": "^8.3.0",
     "toml": "^2.3.3",
+    "url-pattern": "^1.0.3",
     "webpack": "^4.20.2"
   }
 }

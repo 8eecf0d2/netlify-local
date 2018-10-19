@@ -5,6 +5,10 @@ import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
 import * as http from "http";
+import { URL } from "url";
+import * as UrlPattern from "url-pattern";
+//@ts-ignore
+import * as expressHttpProxy from "express-http-proxy";
 
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
@@ -70,35 +74,87 @@ export class Server {
 
   private routeRedirects (redirects: Netlify.Redirect[]): void {
     for(const redirect of redirects) {
+      // XXX: Need to check if this can be made stricter to just match "http" and "https"
+
+      /** Routes which have an absolute urls will be proxied */
+      if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
+        this.handleProxy(redirect);
+        continue;
+      }
+
+      /** Routes which have a 301, 302 or 303 status code are considered typical redirects */
       if([301, 302, 303].includes(redirect.status)) {
         this.handleRedirect(redirect);
-      } else {
-        this.handleRewrite(redirect)
+        continue;
       }
+
+      /** Routes which do not match other conditions are assumed to be rewrites */
+      this.handleRewrite(redirect);
     }
   }
 
   private handleRedirect (redirect: Netlify.Redirect): void {
-    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
+    const placeholderOptions = Server.placeholderOptions(redirect);
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).redirect(redirect.to);
+      return response.status(redirect.status).redirect(placeholderOptions.pattern.stringify(request.params));
     })
   }
 
   private handleRewrite (redirect: Netlify.Redirect): void {
-    this.express.all(redirect.from, this.handleRedirectHeaders(redirect), (request, response, next) => {
+    const placeholderOptions = Server.placeholderOptions(redirect);
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).sendFile(path.join(this.paths.static, redirect.to));
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(request.params)));
     });
   }
 
-  private handleRedirectHeaders (redirect: Netlify.Redirect): express.Handler {
+  private handleProxy (redirect: Netlify.Redirect) {
+    const placeholderOptions = Server.placeholderOptions(redirect);
+
+    this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
+
+      return expressHttpProxy(placeholderOptions.url.origin, {
+        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(request.params),
+      })(request, response, next);
+    });
+  }
+
+  private static placeholderOptions (redirect: Netlify.Redirect) {
+    let redirectUrl: URL;
+
+    if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
+      redirectUrl = new URL(redirect.to);
+    } else {
+      redirectUrl = new URL("http://localhost");
+    }
+
+    const redirectPattern = new UrlPattern(redirectUrl.pathname);
+
+    return {
+      url: redirectUrl,
+      pattern: redirectPattern,
+    }
+  }
+
+  private static redirectHeadersMiddleware (redirect: Netlify.Redirect): express.Handler {
     return (request, response, next) => {
       if(redirect.headers) {
         for(const header in redirect.headers) {
           response.setHeader(header, redirect.headers[header]);
         }
       }
+      next();
+    }
+  }
+
+  private static placeholderParamsMiddleware (): express.Handler {
+    return (request, response, next) => {
+      request.params = {
+        splat: request.params["0"],
+        ...request.params,
+      }
+
       next();
     }
   }
