@@ -106,7 +106,7 @@ export class Server {
     const placeholderOptions = Server.placeholderOptions(redirect);
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).redirect(placeholderOptions.pattern.stringify(request.params));
+      return response.status(redirect.status).redirect(Server.redirectPatternToPath(placeholderOptions.pattern, request.params));
     })
   }
 
@@ -114,7 +114,7 @@ export class Server {
     const placeholderOptions = Server.placeholderOptions(redirect);
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(request.params)));
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, Server.redirectPatternToPath(placeholderOptions.pattern, request.params)));
     });
   }
 
@@ -124,7 +124,7 @@ export class Server {
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
       return expressHttpProxy(placeholderOptions.url.origin, {
-        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(request.params),
+        proxyReqPathResolver: (proxyRequest: express.Request) => Server.redirectPatternToPath(placeholderOptions.pattern, request.params),
       })(request, response, next);
     });
   }
@@ -168,6 +168,9 @@ export class Server {
     }
   }
 
+  private static redirectPatternToPath (pattern: UrlPattern, params: { [key: string]: string }): string {
+    return pattern.stringify(params);
+  }
 
   /**
     Lambda Router
