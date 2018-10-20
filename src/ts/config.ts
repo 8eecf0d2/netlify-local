@@ -6,7 +6,7 @@ import * as gitBranch from "git-branch";
 import { Netlify } from "./netlify";
 import { Webpack } from "./webpack";
 
-export const parseWebpackConfig = (filename: string): Webpack.Config => {
+export const parseWebpackConfig = (filename: string): Webpack.Config|Webpack.Config[] => {
   const webpackConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
 
   if(!webpackConfigExists) {

@@ -44,6 +44,9 @@ export class Server {
     this.routeRedirects(softRedirects);
   }
 
+  /**
+    Static Router
+   */
   private routeStatic (): void {
     if(!this.options.routes.static) {
       return
@@ -57,6 +60,9 @@ export class Server {
     Logger.info("netlify-local: static routes initialized");
   }
 
+  /**
+    Header Router
+   */
   private routeHeaders (headers: Netlify.Headers[]): void {
     for(const header of headers) {
       this.handleHeader(header.for, header.values)
@@ -72,11 +78,14 @@ export class Server {
     })
   }
 
+  /**
+    Redirect Router
+   */
   private routeRedirects (redirects: Netlify.Redirect[]): void {
     for(const redirect of redirects) {
       // XXX: Need to check if this can be made stricter to just match "http" and "https"
 
-      /** Routes which have an absolute urls will be proxied */
+      /** Routes which have an absolute url will be proxied */
       if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
         this.handleProxy(redirect);
         continue;
@@ -97,7 +106,7 @@ export class Server {
     const placeholderOptions = Server.placeholderOptions(redirect);
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).redirect(placeholderOptions.pattern.stringify(request.params));
+      return response.status(redirect.status).redirect(Server.redirectPatternToPath(placeholderOptions.pattern, request.params));
     })
   }
 
@@ -105,7 +114,7 @@ export class Server {
     const placeholderOptions = Server.placeholderOptions(redirect);
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
-      return response.status(redirect.status).sendFile(path.join(this.paths.static, placeholderOptions.pattern.stringify(request.params)));
+      return response.status(redirect.status).sendFile(path.join(this.paths.static, Server.redirectPatternToPath(placeholderOptions.pattern, request.params)));
     });
   }
 
@@ -115,7 +124,7 @@ export class Server {
     this.express.all(redirect.from, Server.redirectHeadersMiddleware(redirect), Server.placeholderParamsMiddleware(), (request, response, next) => {
 
       return expressHttpProxy(placeholderOptions.url.origin, {
-        proxyReqPathResolver: (proxyRequest: express.Request) =>  placeholderOptions.pattern.stringify(request.params),
+        proxyReqPathResolver: (proxyRequest: express.Request) => Server.redirectPatternToPath(placeholderOptions.pattern, request.params),
       })(request, response, next);
     });
   }
@@ -159,6 +168,13 @@ export class Server {
     }
   }
 
+  private static redirectPatternToPath (pattern: UrlPattern, params: { [key: string]: string }): string {
+    return pattern.stringify(params);
+  }
+
+  /**
+    Lambda Router
+   */
   private routeLambda (): void {
     if(!this.options.routes.lambda) {
       return
