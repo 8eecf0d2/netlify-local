@@ -1,7 +1,7 @@
 import * as mocha from "mocha";
 import * as assert from "assert";
 
-import { parseNetlifyConfig, parseWebpackConfig } from "../../src/ts";
+import { parseNetlifyConfig, parseWebpackConfig } from "../../.dist";
 
 process.env.NETLIFY_LOCAL_CONTEXT = "default"
 
