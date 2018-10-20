@@ -116,8 +116,12 @@ export namespace handler {
 }
 ```
 
-### Webpack Issues
+### Webpack
 
+#### Multiple Configs
+If you use multiple Webpack configurations for your application (one for the client, another for lambda) you should set the [`name` property within the Webpack configuration](https://webpack.js.org/configuration/other-options#name) to get better logging, _otherwise config's will be named by their index._
+
+#### Issues
 To correctly execute lambda's they must be self contained bundles, a common issue when bundled incorrectly is missing modules similar to the error below.
 
 ```bash
