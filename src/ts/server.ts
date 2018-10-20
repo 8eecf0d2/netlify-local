@@ -85,7 +85,7 @@ export class Server {
     for(const redirect of redirects) {
       // XXX: Need to check if this can be made stricter to just match "http" and "https"
 
-      /** Routes which have an absolute urls will be proxied */
+      /** Routes which have an absolute url will be proxied */
       if(redirect.to.match(/^(?:[a-z]+:)?\/\//i)) {
         this.handleProxy(redirect);
         continue;
