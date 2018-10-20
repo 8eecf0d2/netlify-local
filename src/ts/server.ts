@@ -44,6 +44,9 @@ export class Server {
     this.routeRedirects(softRedirects);
   }
 
+  /**
+    Static Router
+   */
   private routeStatic (): void {
     if(!this.options.routes.static) {
       return
@@ -57,6 +60,9 @@ export class Server {
     Logger.info("netlify-local: static routes initialized");
   }
 
+  /**
+    Header Router
+   */
   private routeHeaders (headers: Netlify.Headers[]): void {
     for(const header of headers) {
       this.handleHeader(header.for, header.values)
@@ -72,6 +78,9 @@ export class Server {
     })
   }
 
+  /**
+    Redirect Router
+   */
   private routeRedirects (redirects: Netlify.Redirect[]): void {
     for(const redirect of redirects) {
       // XXX: Need to check if this can be made stricter to just match "http" and "https"
@@ -159,6 +168,10 @@ export class Server {
     }
   }
 
+
+  /**
+    Lambda Router
+   */
   private routeLambda (): void {
     if(!this.options.routes.lambda) {
       return
