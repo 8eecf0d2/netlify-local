@@ -83,6 +83,27 @@ You can set the port which the server should bind on by passing in the `-p --por
 netlify-local serve -p 3000
 ```
 
+##### `--certificates`
+
+If you need **https** support you can pass in the `--certificates` argument with a relative path to a directory containing a private key file named `key.pem` and certificate file named `cert.pem`.
+
+```bash
+netlify-local serve --certificates private/certs
+```
+
+If you're not sure how to create certificates for local development you can use the npm script below to generate them.
+```js
+{
+  ...
+  "scripts": {
+    ...
+    "certificates": "mkdir -p private/certs && openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout private/certs/key.pem -out private/certs/cert.pem -subj '/CN=localhost' &> /dev/null",
+    "serve": "netlify-local serve --certificates private/certs"
+  }
+}
+
+```
+
 ### API
 
 Specific classes and methods are exposed for running **netlify-local** programmatically, see [Issue #6](https://github.com/8eecf0d2/netlify-local/issues/6) for more information and documentation.
