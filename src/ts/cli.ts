@@ -20,7 +20,8 @@ program
   .option("-n --netlify <path>", "path to netlify toml config file")
   .option("-w --webpack <path>", "path to webpack config file")
   .option("-c --context <context>", "override context (default: current git branch)")
-  .option("-p --port <port>", "port to serve from (default: 9000)");
+  .option("-p --port <port>", "port to serve from (default: 9000)")
+  .option("--certificates <path>", "certificates for ssl");
 
 program
   .command("serve")
@@ -39,6 +40,10 @@ program
           static: (program.static === "false" ? false : true),
           lambda: (program.lambda === "false" ? false : true),
         },
+        certificates: program.certificates ? {
+          key: fs.readFileSync(path.join(process.cwd(), program.certificates, "key.pem"), "utf8"),
+          cert: fs.readFileSync(path.join(process.cwd(), program.certificates, "cert.pem"), "utf8"),
+        } : undefined,
         port: program.port || 9000
       });
 

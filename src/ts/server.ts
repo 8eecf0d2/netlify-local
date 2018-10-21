@@ -304,6 +304,10 @@ export namespace Server {
       static: boolean;
       lambda: boolean;
     };
+    certificates?: {
+      key: string;
+      cert: string;
+    };
     port: number;
   }
   export interface Paths {
