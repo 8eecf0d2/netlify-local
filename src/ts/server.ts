@@ -5,6 +5,7 @@ import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
 import * as jwt from "jsonwebtoken";
 import * as http from "http";
+import * as https from "https";
 import { URL } from "url";
 import * as UrlPattern from "url-pattern";
 //@ts-ignore
@@ -15,7 +16,7 @@ import { Netlify } from "./netlify";
 
 export class Server {
   private express: express.Express;
-  private server: http.Server;
+  private server: http.Server|https.Server;
   private paths: Server.Paths;
 
   constructor(
@@ -272,16 +273,25 @@ export class Server {
     return response.status(500).json(`Function invocation failed: ${error.toString()}`);
   }
 
-  public listen (): Promise<void> {
-    return new Promise(resolve => {
-      this.server = this.express.listen(this.options.port, (error: Error) => {
-        if (error) {
-          Logger.info("netlify-local: unable to start server");
-          Logger.error(error);
-          process.exit(1);
+  public async listen (): Promise<void> {
+    try {
+      if(this.options.certificates) {
+        this.server = https.createServer(this.options.certificates, this.express);
+      } else {
+        this.server = http.createServer(this.express);
+      }
+    } catch (error) {
+      Logger.info("netlify-local: unable to start server");
+      Logger.error(error);
+      process.exit(1);
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      this.server.listen(this.options.port, (error: Error) => {
+        if(error) {
+          return reject(error);
         }
 
-        Logger.info(`netlify-local: server up on port ${this.options.port}`);
         return resolve();
       });
     });
