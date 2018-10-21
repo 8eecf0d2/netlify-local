@@ -1,7 +1,7 @@
 import * as mocha from "mocha";
 import * as assert from "assert";
 
-import { parseNetlifyConfig, Server } from "../../src/ts";
+import { parseNetlifyConfig, Server } from "../../.dist";
 
 process.env.SILENT = "true";
 
