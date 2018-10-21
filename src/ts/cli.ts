@@ -8,7 +8,7 @@ import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
 import { Webpack } from "./webpack";
-import { parseNetlifyConfig, parseNetlifyLocalConfig, parseWebpackConfig } from "./config";
+import { parseNetlifyConfig, parseNetlifyPluginLocalConfig, parseSslCertificates, parseWebpackConfig } from "./config";
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
@@ -34,12 +34,16 @@ program
 
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
 
-      const netlifyPluginLocalConfig = parseNetlifyLocalConfig(netlifyConfig, {
-        webpack: program.webpack,
-        static: program.static === "false" ? false : true,
-        lambda: program.lambda === "false" ? false : true,
-        certificates: program.certificates,
-        port: program.port || 9000,
+      const netlifyPluginLocalConfig = parseNetlifyPluginLocalConfig(netlifyConfig, {
+        webpack: {
+          config: program.webpack,
+        },
+        server: {
+          static: program.static === "false" ? false : true,
+          lambda: program.lambda === "false" ? false : true,
+          certificates: program.certificates,
+          port: program.port || 9000,
+        }
       });
 
       const server = new Server({
@@ -48,10 +52,7 @@ program
           static: netlifyPluginLocalConfig.server.static,
           lambda: netlifyPluginLocalConfig.server.lambda,
         },
-        certificates: netlifyPluginLocalConfig.server.certificates ? {
-          key: fs.readFileSync(path.join(process.cwd(), netlifyPluginLocalConfig.server.certificates, "key.pem"), "utf8"),
-          cert: fs.readFileSync(path.join(process.cwd(), netlifyPluginLocalConfig.server.certificates, "cert.pem"), "utf8"),
-        } : undefined,
+        certificates: netlifyPluginLocalConfig.server.certificates ? parseSslCertificates(netlifyPluginLocalConfig.server.certificates) : undefined,
         port: netlifyPluginLocalConfig.server.port
       });
 
