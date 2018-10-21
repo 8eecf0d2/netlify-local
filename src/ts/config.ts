@@ -127,8 +127,27 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
       }
     }
   }
-  }
-  }
 
   return netlifyPluginLocalConfig;
+}
+
+
+export const parseSslCertificates = (directory?: string): { key: string, cert: string } => {
+  const keyFilePath = path.join(process.cwd(), directory, "key.pem");
+  const certFilePath = path.join(process.cwd(), directory, "cert.pem");
+  const keyFileExists = fs.existsSync(keyFilePath);
+  const certFileExists = fs.existsSync(certFilePath);
+
+  if(!keyFileExists) {
+    throw new Error(`cannot find certificate key file "${keyFilePath}"`);
+  }
+
+  if(!certFileExists) {
+    throw new Error(`cannot find certificate cert file in "${certFilePath}"`);
+  }
+
+  return {
+    key: fs.readFileSync(keyFilePath, "utf8"),
+    cert: fs.readFileSync(certFilePath, "utf8"),
+  }
 }
