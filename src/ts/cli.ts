@@ -8,7 +8,7 @@ import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
 import { Webpack } from "./webpack";
-import { parseNetlifyConfig, parseWebpackConfig } from "./config";
+import { parseNetlifyConfig, parseNetlifyLocalConfig, parseWebpackConfig } from "./config";
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
@@ -34,23 +34,31 @@ program
 
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
 
+      const netlifyPluginLocalConfig = parseNetlifyLocalConfig(netlifyConfig, {
+        webpack: program.webpack,
+        static: program.static === "false" ? false : true,
+        lambda: program.lambda === "false" ? false : true,
+        certificates: program.certificates,
+        port: program.port || 9000,
+      });
+
       const server = new Server({
         netlifyConfig: netlifyConfig,
         routes: {
-          static: (program.static === "false" ? false : true),
-          lambda: (program.lambda === "false" ? false : true),
+          static: netlifyPluginLocalConfig.server.static,
+          lambda: netlifyPluginLocalConfig.server.lambda,
         },
-        certificates: program.certificates ? {
-          key: fs.readFileSync(path.join(process.cwd(), program.certificates, "key.pem"), "utf8"),
-          cert: fs.readFileSync(path.join(process.cwd(), program.certificates, "cert.pem"), "utf8"),
+        certificates: netlifyPluginLocalConfig.server.certificates ? {
+          key: fs.readFileSync(path.join(process.cwd(), netlifyPluginLocalConfig.server.certificates, "key.pem"), "utf8"),
+          cert: fs.readFileSync(path.join(process.cwd(), netlifyPluginLocalConfig.server.certificates, "cert.pem"), "utf8"),
         } : undefined,
-        port: program.port || 9000
+        port: netlifyPluginLocalConfig.server.port
       });
 
       await server.listen();
 
-      if(Boolean(program.webpack)) {
-        const webpackConfig = parseWebpackConfig(program.webpack);
+      if(netlifyPluginLocalConfig.webpack.config) {
+        const webpackConfig = parseWebpackConfig(netlifyPluginLocalConfig.webpack.config);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
