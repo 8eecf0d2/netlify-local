@@ -57,7 +57,7 @@ export const parseNetlifyConfig = (filename: string): Netlify.Config => {
   return netlifyConfig;
 }
 
-export const parseNetlifyLocalConfig = (netlifyConfig: Netlify.Config, cliOptions: any): Netlify.Plugins.Local => {
+export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, overrides?: Netlify.Plugins.Local): Netlify.Plugins.Local => {
   const netlifyPluginLocalConfig: Netlify.Plugins.Local = {
     webpack: {
       config: undefined,
@@ -76,50 +76,58 @@ export const parseNetlifyLocalConfig = (netlifyConfig: Netlify.Config, cliOption
 
   /** Parse config from Netlify configuration plugins */
   if(netlifyConfig.plugins.local) {
-    if(netlifyConfig.plugins.local.hasOwnProperty("webpack")) {
-      if(netlifyConfig.plugins.local.webpack.hasOwnProperty("config")) {
+    if(netlifyConfig.plugins.local.webpack !== undefined) {
+      if(netlifyConfig.plugins.local.webpack.config !== undefined) {
         netlifyPluginLocalConfig.webpack.config = netlifyConfig.plugins.local.webpack.config;
       }
     }
-    if(netlifyConfig.plugins.local.hasOwnProperty("server")) {
-      if(netlifyConfig.plugins.local.server.hasOwnProperty("static")) {
+    if(netlifyConfig.plugins.local.server !== undefined) {
+      if(netlifyConfig.plugins.local.server.static !== undefined) {
         netlifyPluginLocalConfig.server.static = netlifyConfig.plugins.local.server.static;
       }
-      if(netlifyConfig.plugins.local.server.hasOwnProperty("lambda")) {
+      if(netlifyConfig.plugins.local.server.lambda !== undefined) {
         netlifyPluginLocalConfig.server.lambda = netlifyConfig.plugins.local.server.lambda;
       }
-      if(netlifyConfig.plugins.local.server.hasOwnProperty("certificates")) {
+      if(netlifyConfig.plugins.local.server.certificates !== undefined) {
         netlifyPluginLocalConfig.server.certificates = netlifyConfig.plugins.local.server.certificates;
       }
-      if(netlifyConfig.plugins.local.server.hasOwnProperty("port")) {
+      if(netlifyConfig.plugins.local.server.port !== undefined) {
         netlifyPluginLocalConfig.server.port = netlifyConfig.plugins.local.server.port;
       }
     }
-    if(netlifyConfig.plugins.local.hasOwnProperty("functions")) {
-      if(netlifyConfig.plugins.local.functions.hasOwnProperty("source")) {
+    if(netlifyConfig.plugins.local.functions !== undefined) {
+      if(netlifyConfig.plugins.local.functions.source !== undefined) {
         netlifyPluginLocalConfig.functions.source = netlifyConfig.plugins.local.functions.source;
       }
-      if(netlifyConfig.plugins.local.functions.hasOwnProperty("files")) {
+      if(netlifyConfig.plugins.local.functions.files !== undefined) {
         netlifyPluginLocalConfig.functions.files = netlifyConfig.plugins.local.functions.files;
       }
     }
   }
 
   /** Parse command line options */
-  if(cliOptions.webpack !== undefined) {
-    netlifyPluginLocalConfig.webpack.config = cliOptions.webpack;
+  if(overrides) {
+    if(overrides.webpack !== undefined) {
+      if(overrides.webpack.config !== undefined) {
+        netlifyPluginLocalConfig.webpack.config = overrides.webpack.config;
+      }
+    }
+    if(overrides.server !== undefined) {
+      if(overrides.server.static !== undefined) {
+        netlifyPluginLocalConfig.server.static = overrides.server.static;
+      }
+      if(overrides.server.lambda !== undefined) {
+        netlifyPluginLocalConfig.server.lambda = overrides.server.lambda;
+      }
+      if(overrides.server.certificates !== undefined) {
+        netlifyPluginLocalConfig.server.certificates = overrides.server.certificates;
+      }
+      if(overrides.server.port !== undefined) {
+        netlifyPluginLocalConfig.server.port = overrides.server.port;
+      }
+    }
   }
-  if(cliOptions.static !== undefined) {
-    netlifyPluginLocalConfig.server.static = cliOptions.static;
   }
-  if(cliOptions.lambda !== undefined) {
-    netlifyPluginLocalConfig.server.lambda = cliOptions.lambda;
-  }
-  if(cliOptions.certificates !== undefined) {
-    netlifyPluginLocalConfig.server.certificates = cliOptions.certificates;
-  }
-  if(cliOptions.port !== undefined) {
-    netlifyPluginLocalConfig.server.port = cliOptions.port;
   }
 
   return netlifyPluginLocalConfig;
