@@ -42,7 +42,7 @@ program
           static: program.static === "false" ? false : true,
           lambda: program.lambda === "false" ? false : true,
           certificates: program.certificates,
-          port: program.port || 9000,
+          port: program.port,
         }
       });
 

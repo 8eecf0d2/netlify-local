@@ -63,10 +63,10 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
       config: undefined,
     },
     server: {
-      static: undefined,
-      lambda: undefined,
+      static: true,
+      lambda: true,
       certificates: undefined,
-      port: undefined,
+      port: 9000,
     },
     functions: {
       source: undefined,
