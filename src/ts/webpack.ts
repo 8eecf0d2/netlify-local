@@ -31,7 +31,7 @@ export class Webpack {
       for(let iter = 0; iter < this.compilers.length; iter++) {
         const compiler = this.compilers[iter];
         compiler.run((error, stats) => {
-          if(error) {
+          if(error || stats.hasErrors()) {
             Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)})`);
             Logger.error(error);
 
@@ -49,9 +49,9 @@ export class Webpack {
     for(let iter = 0; iter < this.compilers.length; iter++) {
       const compiler = this.compilers[iter];
       compiler.watch({}, (error, stats) => {
-        if(error) {
           Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)})`);
           Logger.error(error);
+        if(error || stats.hasErrors()) {
 
           return;
         }
