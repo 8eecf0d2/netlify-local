@@ -46,12 +46,6 @@ program
 
       const server = new Server({
         netlifyConfig: netlifyConfig,
-        routes: {
-          static: netlifyConfig.plugins.local.server.static,
-          lambda: netlifyConfig.plugins.local.server.lambda,
-        },
-        certificates: netlifyConfig.plugins.local.server.certificates ? parseSslCertificates(netlifyConfig.plugins.local.server.certificates) : undefined,
-        port: netlifyConfig.plugins.local.server.port
       });
 
       await server.listen();

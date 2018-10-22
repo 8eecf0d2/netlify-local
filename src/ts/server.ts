@@ -13,11 +13,13 @@ import * as expressHttpProxy from "express-http-proxy";
 
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
+import { parseSslCertificates } from "./config";
 
 export class Server {
   private express: express.Express;
   private server: http.Server|https.Server;
   private paths: Server.Paths;
+  private certificates: Server.Certificates;
 
   constructor(
     private options: Server.Options,
@@ -30,6 +32,7 @@ export class Server {
       static: path.join(process.cwd(), String(this.options.netlifyConfig.build.publish)),
       lambda: path.join(process.cwd(), String(this.options.netlifyConfig.build.functions)),
     }
+    this.certificates = this.options.netlifyConfig.plugins.local.server.certificates ? parseSslCertificates(this.options.netlifyConfig.plugins.local.server.certificates) : undefined,
 
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
@@ -49,7 +52,7 @@ export class Server {
     Static Router
    */
   private routeStatic (): void {
-    if(!this.options.routes.static) {
+    if(!this.options.netlifyConfig.plugins.local.server.static) {
       return
     }
 
@@ -177,7 +180,7 @@ export class Server {
     Lambda Router
    */
   private routeLambda (): void {
-    if(!this.options.routes.lambda) {
+    if(!this.options.netlifyConfig.plugins.local.server.lambda) {
       return
     }
 
@@ -275,8 +278,8 @@ export class Server {
 
   public async listen (): Promise<void> {
     try {
-      if(this.options.certificates) {
-        this.server = https.createServer(this.options.certificates, this.express);
+      if(this.certificates) {
+        this.server = https.createServer(this.certificates, this.express);
       } else {
         this.server = http.createServer(this.express);
       }
@@ -287,7 +290,7 @@ export class Server {
     }
 
     return new Promise<void>((resolve, reject) => {
-      this.server.listen(this.options.port, (error: Error) => {
+      this.server.listen(this.options.netlifyConfig.plugins.local.server.port, (error: Error) => {
         if(error) {
           return reject(error);
         }
@@ -300,7 +303,7 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        Logger.info(`netlify-local: server down on port ${this.options.port}`);
+        Logger.info(`netlify-local: server down on port ${this.options.netlifyConfig.plugins.local.server.port}`);
         resolve();
       });
     });
@@ -310,16 +313,11 @@ export class Server {
 export namespace Server {
   export interface Options {
     netlifyConfig: Netlify.Config;
-    routes: {
-      static: boolean;
-      lambda: boolean;
-    };
-    certificates?: {
-      key: string;
-      cert: string;
-    };
-    port: number;
   }
+  export interface Certificates {
+    key: string;
+    cert: string;
+  };
   export interface Paths {
     static: string;
     lambda: string;
