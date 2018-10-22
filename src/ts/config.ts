@@ -18,7 +18,7 @@ export const parseWebpackConfig = (filename: string): Webpack.Config|Webpack.Con
   return webpackConfig;
 }
 
-export const parseNetlifyConfig = (filename: string): Netlify.Config => {
+export const parseNetlifyConfig = (filename: string, overrides?: Netlify.Plugins.Local): Netlify.Config => {
   const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
   if(!netlifyConfigExists) {
     throw new Error(`cannot find netlify configuration file "${filename}"`);
@@ -52,6 +52,10 @@ export const parseNetlifyConfig = (filename: string): Netlify.Config => {
         ...redirect,
       }
     });
+  }
+
+  netlifyConfig.plugins = {
+    local: parseNetlifyPluginLocalConfig(netlifyConfig, overrides),
   }
 
   return netlifyConfig;

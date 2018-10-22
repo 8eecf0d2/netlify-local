@@ -32,21 +32,17 @@ program
         process.env.NETLIFY_LOCAL_CONTEXT = program.context;
       }
 
-      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
-
-      netlifyConfig.plugins = {
-        local: parseNetlifyPluginLocalConfig(netlifyConfig, {
-          webpack: {
-            config: program.webpack,
-          },
-          server: {
-            static: program.static === "false" ? false : true,
-            lambda: program.lambda === "false" ? false : true,
-            certificates: program.certificates,
-            port: program.port,
-          }
-        })
-      };
+      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
+        webpack: {
+          config: program.webpack,
+        },
+        server: {
+          static: program.static === "false" ? false : true,
+          lambda: program.lambda === "false" ? false : true,
+          certificates: program.certificates,
+          port: program.port,
+        }
+      });
 
       const server = new Server({
         netlifyConfig: netlifyConfig,
