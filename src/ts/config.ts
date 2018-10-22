@@ -79,32 +79,34 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
   };
 
   /** Parse config from Netlify configuration plugins */
-  if(netlifyConfig.plugins.local) {
-    if(netlifyConfig.plugins.local.webpack !== undefined) {
-      if(netlifyConfig.plugins.local.webpack.config !== undefined) {
-        netlifyPluginLocalConfig.webpack.config = netlifyConfig.plugins.local.webpack.config;
+  if(netlifyConfig.plugins) {
+    if(netlifyConfig.plugins.local) {
+      if(netlifyConfig.plugins.local.webpack !== undefined) {
+        if(netlifyConfig.plugins.local.webpack.config !== undefined) {
+          netlifyPluginLocalConfig.webpack.config = netlifyConfig.plugins.local.webpack.config;
+        }
       }
-    }
-    if(netlifyConfig.plugins.local.server !== undefined) {
-      if(netlifyConfig.plugins.local.server.static !== undefined) {
-        netlifyPluginLocalConfig.server.static = netlifyConfig.plugins.local.server.static;
+      if(netlifyConfig.plugins.local.server !== undefined) {
+        if(netlifyConfig.plugins.local.server.static !== undefined) {
+          netlifyPluginLocalConfig.server.static = netlifyConfig.plugins.local.server.static;
+        }
+        if(netlifyConfig.plugins.local.server.lambda !== undefined) {
+          netlifyPluginLocalConfig.server.lambda = netlifyConfig.plugins.local.server.lambda;
+        }
+        if(netlifyConfig.plugins.local.server.certificates !== undefined) {
+          netlifyPluginLocalConfig.server.certificates = netlifyConfig.plugins.local.server.certificates;
+        }
+        if(netlifyConfig.plugins.local.server.port !== undefined) {
+          netlifyPluginLocalConfig.server.port = netlifyConfig.plugins.local.server.port;
+        }
       }
-      if(netlifyConfig.plugins.local.server.lambda !== undefined) {
-        netlifyPluginLocalConfig.server.lambda = netlifyConfig.plugins.local.server.lambda;
-      }
-      if(netlifyConfig.plugins.local.server.certificates !== undefined) {
-        netlifyPluginLocalConfig.server.certificates = netlifyConfig.plugins.local.server.certificates;
-      }
-      if(netlifyConfig.plugins.local.server.port !== undefined) {
-        netlifyPluginLocalConfig.server.port = netlifyConfig.plugins.local.server.port;
-      }
-    }
-    if(netlifyConfig.plugins.local.functions !== undefined) {
-      if(netlifyConfig.plugins.local.functions.source !== undefined) {
-        netlifyPluginLocalConfig.functions.source = netlifyConfig.plugins.local.functions.source;
-      }
-      if(netlifyConfig.plugins.local.functions.files !== undefined) {
-        netlifyPluginLocalConfig.functions.files = netlifyConfig.plugins.local.functions.files;
+      if(netlifyConfig.plugins.local.functions !== undefined) {
+        if(netlifyConfig.plugins.local.functions.source !== undefined) {
+          netlifyPluginLocalConfig.functions.source = netlifyConfig.plugins.local.functions.source;
+        }
+        if(netlifyConfig.plugins.local.functions.files !== undefined) {
+          netlifyPluginLocalConfig.functions.files = netlifyConfig.plugins.local.functions.files;
+        }
       }
     }
   }
