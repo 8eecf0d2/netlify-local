@@ -32,12 +32,14 @@ export class Webpack {
         const compiler = this.compilers[iter];
         compiler.run((error, stats) => {
           if(error || stats.hasErrors()) {
-            Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)})`);
-            Logger.error(error);
+            Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)}:${stats.hash})`);
+            Logger.error(stats.toString("minimal"));
 
             return reject(error);
           }
-          Logger.info(`netlify-local: webpack build success (${this.compilerName(compiler, iter)})`);
+
+          Logger.info(`netlify-local: webpack build success (${this.compilerName(compiler, iter)}:${stats.hash})`);
+
           return resolve(stats);
         });
       }
@@ -49,14 +51,14 @@ export class Webpack {
     for(let iter = 0; iter < this.compilers.length; iter++) {
       const compiler = this.compilers[iter];
       compiler.watch({}, (error, stats) => {
-          Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)})`);
-          Logger.error(error);
         if(error || stats.hasErrors()) {
+          Logger.info(`netlify-local: webpack build failure (${this.compilerName(compiler, iter)}:${stats.hash})`);
+          Logger.error(stats.toString("minimal"));
 
           return;
         }
 
-        Logger.info(`netlify-local: webpack build success (${this.compilerName(compiler, iter)})`);
+        Logger.info(`netlify-local: webpack build success (${this.compilerName(compiler, iter)}:${stats.hash})`);
       });
     }
   }
