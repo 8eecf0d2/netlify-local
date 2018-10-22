@@ -34,32 +34,34 @@ program
 
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
 
-      const netlifyPluginLocalConfig = parseNetlifyPluginLocalConfig(netlifyConfig, {
-        webpack: {
-          config: program.webpack,
-        },
-        server: {
-          static: program.static === "false" ? false : true,
-          lambda: program.lambda === "false" ? false : true,
-          certificates: program.certificates,
-          port: program.port,
-        }
-      });
+      netlifyConfig.plugins = {
+        local: parseNetlifyPluginLocalConfig(netlifyConfig, {
+          webpack: {
+            config: program.webpack,
+          },
+          server: {
+            static: program.static === "false" ? false : true,
+            lambda: program.lambda === "false" ? false : true,
+            certificates: program.certificates,
+            port: program.port,
+          }
+        })
+      };
 
       const server = new Server({
         netlifyConfig: netlifyConfig,
         routes: {
-          static: netlifyPluginLocalConfig.server.static,
-          lambda: netlifyPluginLocalConfig.server.lambda,
+          static: netlifyConfig.plugins.local.server.static,
+          lambda: netlifyConfig.plugins.local.server.lambda,
         },
-        certificates: netlifyPluginLocalConfig.server.certificates ? parseSslCertificates(netlifyPluginLocalConfig.server.certificates) : undefined,
-        port: netlifyPluginLocalConfig.server.port
+        certificates: netlifyConfig.plugins.local.server.certificates ? parseSslCertificates(netlifyConfig.plugins.local.server.certificates) : undefined,
+        port: netlifyConfig.plugins.local.server.port
       });
 
       await server.listen();
 
-      if(netlifyPluginLocalConfig.webpack.config) {
-        const webpackConfig = parseWebpackConfig(netlifyPluginLocalConfig.webpack.config);
+      if(netlifyConfig.plugins.local.webpack.config) {
+        const webpackConfig = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
