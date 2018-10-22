@@ -280,8 +280,10 @@ export class Server {
     try {
       if(this.certificates) {
         this.server = https.createServer(this.certificates, this.express);
+        Logger.info("netlify-local: starting https server");
       } else {
         this.server = http.createServer(this.express);
+        Logger.info("netlify-local: starting http server");
       }
     } catch (error) {
       Logger.info("netlify-local: unable to start server");
@@ -294,6 +296,8 @@ export class Server {
         if(error) {
           return reject(error);
         }
+
+        Logger.info(`netlify-local: server up on port ${this.options.netlifyConfig.plugins.local.server.port}`);
 
         return resolve();
       });
