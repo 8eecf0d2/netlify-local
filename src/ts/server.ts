@@ -201,21 +201,30 @@ export class Server {
 
       const module = path.join(this.paths.lambda, request.params.lambda);
 
-      delete require.cache[require.resolve(module)];
+      try {
+        delete require.cache[require.resolve(module)]
+      } catch (error) {
+        return Server.handleLambdaError(response, error);
+      }
 
       let lambda: { handler: Netlify.Handler };
 
       try {
         lambda = require(module);
       } catch (error) {
-
-        return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+        return Server.handleLambdaError(response, error);
       }
 
       const lambdaRequest = Server.lambdaRequest(request);
       const lambdaContext = Server.lambdaContext(request);
 
-      const lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+      let lambdaExecution: Promise<Netlify.Handler.Response> | void;
+
+      try {
+        lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+      } catch (error) {
+        return Server.handleLambdaError(response, error)
+      }
 
       if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
         return lambdaExecution
