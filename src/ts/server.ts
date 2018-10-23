@@ -43,8 +43,8 @@ export class Server {
 
     this.routeHeaders(this.options.netlifyConfig.headers);
     this.routeRedirects(hardRedirects);
-    this.routeStatic();
     this.routeLambda();
+    this.routeStatic();
     this.routeRedirects(softRedirects);
   }
 
