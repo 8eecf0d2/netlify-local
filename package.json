@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/assert": "^1.4.0",
     "@types/body-parser": "^1.17.0",
+    "@types/chalk": "^2.2.0",
     "@types/express": "^4.16.0",
     "@types/git-branch": "^2.0.0",
     "@types/jsonwebtoken": "^7.2.8",
@@ -33,6 +34,7 @@
   },
   "dependencies": {
     "body-parser": "^1.18.3",
+    "chalk": "^2.4.1",
     "commander": "^2.19.0",
     "express": "^4.16.4",
     "express-http-proxy": "^1.4.0",

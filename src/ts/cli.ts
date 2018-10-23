@@ -58,7 +58,7 @@ program
 
     })()
       .catch(error => {
-        Logger.info(error)
+        Logger.error(error)
         process.exit(1);
       })
   });

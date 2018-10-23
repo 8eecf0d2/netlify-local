@@ -60,8 +60,11 @@ export class Server {
       throw new Error("cannot find `build.publish` property within toml config");
     }
 
-    this.express.use(this.options.netlifyConfig.build.base, serveStatic(this.paths.static));
-    Logger.info("netlify-local: static routes initialized");
+    this.express.use(this.options.netlifyConfig.build.base, (request, response, next) => {
+      Logger.info(`static router - "${request.path}"`);
+      next();
+    }, serveStatic(this.paths.static));
+    Logger.info("static routes initialized");
   }
 
   /**
@@ -189,18 +192,19 @@ export class Server {
     }
 
     this.express.all("/.netlify/functions/:lambda", this.handleLambda());
-    Logger.info("netlify-local: lambda routes initialized");
+    Logger.info("lambda routes initialized");
   }
 
   private handleLambda (): express.Handler {
     return (request, response, next) => {
-      Logger.info(`netlify-local: lambda invoked "${request.params.lambda}"`);
+      Logger.info(`lambda router - "${request.params.lambda}"`);
 
       const module = path.join(this.paths.lambda, request.params.lambda);
 
       delete require.cache[require.resolve(module)];
 
       let lambda: { handler: Netlify.Handler };
+
       try {
         lambda = require(module);
       } catch (error) {
@@ -273,20 +277,22 @@ export class Server {
   }
 
   static handleLambdaError (response: express.Response, error: Error): express.Response {
-    return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+    Logger.error(`lambda invocation failed: ${error.toString()}`);
+
+    return response.status(500).json(`lambda invocation failed: ${error.toString()}`);
   }
 
   public async listen (): Promise<void> {
     try {
       if(this.certificates) {
         this.server = https.createServer(this.certificates, this.express);
-        Logger.info("netlify-local: starting https server");
+        Logger.info("starting https server");
       } else {
         this.server = http.createServer(this.express);
-        Logger.info("netlify-local: starting http server");
+        Logger.info("starting http server");
       }
     } catch (error) {
-      Logger.info("netlify-local: unable to start server");
+      Logger.error("unable to start server");
       Logger.error(error);
       process.exit(1);
     }
@@ -297,7 +303,7 @@ export class Server {
           return reject(error);
         }
 
-        Logger.info(`netlify-local: server up on port ${this.options.netlifyConfig.plugins.local.server.port}`);
+        Logger.good(`server up on port ${this.options.netlifyConfig.plugins.local.server.port}`);
 
         return resolve();
       });
@@ -307,8 +313,9 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        Logger.info(`netlify-local: server down on port ${this.options.netlifyConfig.plugins.local.server.port}`);
-        resolve();
+        Logger.info(`server down on port ${this.options.netlifyConfig.plugins.local.server.port}`);
+
+        return resolve();
       });
     });
   }
