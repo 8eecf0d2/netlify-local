@@ -35,6 +35,10 @@ export const parseNetlifyConfig = (filename: string, overrides?: Netlify.Plugins
     netlifyConfig.build = {
       ...netlifyConfig.build,
       ...netlifyConfig.context[context],
+      environment: {
+        ...netlifyConfig.build.environment,
+        ...netlifyConfig.context[context].environment
+      },
     }
   }
 
