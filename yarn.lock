@@ -971,8 +971,8 @@ expand-tilde@^2.0.0, expand-tilde@^2.0.2:
     homedir-polyfill "^1.0.1"
 
 express-http-proxy@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/express-http-proxy/-/express-http-proxy-1.4.0.tgz#36524e22f0b93869ca10119b551b23b2626d1e0e"
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/express-http-proxy/-/express-http-proxy-1.5.0.tgz#27aca3898e2f0cb9aff2e1d00c93ec27014254a2"
   dependencies:
     debug "^3.0.1"
     es6-promise "^4.1.1"
