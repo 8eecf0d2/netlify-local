@@ -37,8 +37,8 @@ program
           config: program.webpack,
         },
         server: {
-          static: program.static === "false" ? false : true,
-          lambda: program.lambda === "false" ? false : true,
+          static: program.static === undefined ? undefined : program.static === "false" ? false : true,
+          lambda: program.lambda === undefined ? undefined : program.lambda === "false" ? false : true,
           certificates: program.certificates,
           port: program.port,
         }
