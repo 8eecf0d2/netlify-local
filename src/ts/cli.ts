@@ -8,7 +8,7 @@ import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
 import { Webpack } from "./webpack";
-import { parseNetlifyConfig, parseWebpackConfig } from "./config";
+import { parseNetlifyConfig, parseNetlifyPluginLocalConfig, parseSslCertificates, parseWebpackConfig } from "./config";
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
@@ -32,32 +32,33 @@ program
         process.env.NETLIFY_LOCAL_CONTEXT = program.context;
       }
 
-      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml");
+      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
+        webpack: {
+          config: program.webpack,
+        },
+        server: {
+          static: program.static === undefined ? undefined : program.static === "false" ? false : true,
+          lambda: program.lambda === undefined ? undefined : program.lambda === "false" ? false : true,
+          certificates: program.certificates,
+          port: program.port,
+        }
+      });
 
       const server = new Server({
         netlifyConfig: netlifyConfig,
-        routes: {
-          static: (program.static === "false" ? false : true),
-          lambda: (program.lambda === "false" ? false : true),
-        },
-        certificates: program.certificates ? {
-          key: fs.readFileSync(path.join(process.cwd(), program.certificates, "key.pem"), "utf8"),
-          cert: fs.readFileSync(path.join(process.cwd(), program.certificates, "cert.pem"), "utf8"),
-        } : undefined,
-        port: program.port || 9000
       });
 
       await server.listen();
 
-      if(Boolean(program.webpack)) {
-        const webpackConfig = parseWebpackConfig(program.webpack);
+      if(netlifyConfig.plugins.local.webpack.config) {
+        const webpackConfig = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
 
     })()
       .catch(error => {
-        Logger.info(error)
+        Logger.error(error)
         process.exit(1);
       })
   });

@@ -12,6 +12,26 @@ export namespace Netlify {
     context?: any;
     redirects: Netlify.Redirect[];
     headers: Netlify.Headers[];
+    plugins?: {
+      local?: Netlify.Plugins.Local;
+    }
+  }
+  export namespace Plugins {
+    export interface Local {
+      webpack?: {
+        config: string;
+      };
+      server?: {
+        static?: boolean;
+        lambda?: boolean;
+        certificates?: string;
+        port?: number;
+      };
+      functions?: {
+        source: string;
+        files: string[];
+      };
+    }
   }
   export interface Redirect {
     from: string;
