@@ -21,6 +21,15 @@ You should probably install as a dev dependency, but globally works too.
 yarn add -D netlify-local
 ```
 
+### Usage
+
+Currently **netlify-local** only provides a **serve** command.
+```bash
+netlify-local serve <options>
+```
+
+For a detailed list of options [see the wiki](https://github.com/8eecf0d2/netlify-local/wiki/Serve-Options).
+
 ### Features
 
 #### Static Router
@@ -34,75 +43,6 @@ This feature refers to [Netlify Redirects](https://www.netlify.com/docs/netlify-
 
 #### Headers
 This feature refers to [Netlify Headers](https://www.netlify.com/docs/netlify-toml-reference#headers), for the most part this works as expected however the [Netlify Basic Auth](https://www.netlify.com/docs/headers-and-basic-auth/#basic-auth) portion is not supported.
-
-### Commands
-
-#### `serve`
-
-By default **netlify-local** will _try_ and start the **static router** and the **lambda router**.
-
-```bash
-netlify-local serve
-```
-
-##### `-s --static, -l --lambda`
-You can prevent the **static router** or **lambda router** from being initialized by passing in the `-s --static` or `-l --lambda` with the value `false`.
-
-```bash
-netlify-local serve -s false -l false
-```
-
-##### `-c --context`
-The [deploy context](https://www.netlify.com/docs/netlify-toml-reference#deploy-context) will be derived from the currently checked out git branch, you can pass in the `-c --context` argument to override this value.
-
-```bash
-netlify-local serve -c foo-branch
-```
-
-##### `-n --netlify`
-
-If your `netlify.toml` is not in the current directory you can pass in the `-n --netlify` argument with a relative path to the configuration file.
-
-```bash
-netlify-local serve -n app-functions/netlify.toml
-```
-
-##### `-w --webpack`
-
-If your source files require a webpack build process you can pass in the `-w --webpack` argument with a relative path to your webpack config which will create a [Webpack compiler](https://webpack.js.org/api/node/#watching) and watch your files. _There are no plans to support additional build tools._
-
-```bash
-netlify-local serve -w webpack.config.js
-```
-
-##### `-p --port`
-
-You can set the port which the server should bind on by passing in the `-p --port` argument with a number, defaults to `9000`.
-
-```bash
-netlify-local serve -p 3000
-```
-
-##### `--certificates`
-
-If you need **https** support you can pass in the `--certificates` argument with a relative path to a directory containing a private key file named `key.pem` and certificate file named `cert.pem`.
-
-```bash
-netlify-local serve --certificates private/certs
-```
-
-If you're not sure how to create certificates for local development you can use the npm script below to generate them.
-```js
-{
-  ...
-  "scripts": {
-    ...
-    "certificates": "mkdir -p private/certs && openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout private/certs/key.pem -out private/certs/cert.pem -subj '/CN=localhost' &> /dev/null",
-    "serve": "netlify-local serve --certificates private/certs"
-  }
-}
-
-```
 
 ### API
 

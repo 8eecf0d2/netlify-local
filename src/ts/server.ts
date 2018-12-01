@@ -13,11 +13,13 @@ import * as expressHttpProxy from "express-http-proxy";
 
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
+import { parseSslCertificates } from "./config";
 
 export class Server {
   private express: express.Express;
   private server: http.Server|https.Server;
   private paths: Server.Paths;
+  private certificates: Server.Certificates;
 
   constructor(
     private options: Server.Options,
@@ -30,6 +32,7 @@ export class Server {
       static: path.join(process.cwd(), String(this.options.netlifyConfig.build.publish)),
       lambda: path.join(process.cwd(), String(this.options.netlifyConfig.build.functions)),
     }
+    this.certificates = this.options.netlifyConfig.plugins.local.server.certificates ? parseSslCertificates(this.options.netlifyConfig.plugins.local.server.certificates) : undefined,
 
     this.express = express();
     this.express.use(bodyParser.raw({ limit: "6mb" }));
@@ -40,8 +43,8 @@ export class Server {
 
     this.routeHeaders(this.options.netlifyConfig.headers);
     this.routeRedirects(hardRedirects);
-    this.routeStatic();
     this.routeLambda();
+    this.routeStatic();
     this.routeRedirects(softRedirects);
   }
 
@@ -49,7 +52,7 @@ export class Server {
     Static Router
    */
   private routeStatic (): void {
-    if(!this.options.routes.static) {
+    if(!this.options.netlifyConfig.plugins.local.server.static) {
       return
     }
 
@@ -57,8 +60,11 @@ export class Server {
       throw new Error("cannot find `build.publish` property within toml config");
     }
 
-    this.express.use(this.options.netlifyConfig.build.base, serveStatic(this.paths.static));
-    Logger.info("netlify-local: static routes initialized");
+    this.express.use(this.options.netlifyConfig.build.base, (request, response, next) => {
+      Logger.info(`static router - "${request.path}"`);
+      next();
+    }, serveStatic(this.paths.static));
+    Logger.info("static routes initialized");
   }
 
   /**
@@ -177,7 +183,7 @@ export class Server {
     Lambda Router
    */
   private routeLambda (): void {
-    if(!this.options.routes.lambda) {
+    if(!this.options.netlifyConfig.plugins.local.server.lambda) {
       return
     }
 
@@ -186,29 +192,39 @@ export class Server {
     }
 
     this.express.all("/.netlify/functions/:lambda", this.handleLambda());
-    Logger.info("netlify-local: lambda routes initialized");
+    Logger.info("lambda routes initialized");
   }
 
   private handleLambda (): express.Handler {
     return (request, response, next) => {
-      Logger.info(`netlify-local: lambda invoked "${request.params.lambda}"`);
+      Logger.info(`lambda router - "${request.params.lambda}"`);
 
       const module = path.join(this.paths.lambda, request.params.lambda);
 
-      delete require.cache[require.resolve(module)];
+      try {
+        delete require.cache[require.resolve(module)]
+      } catch (error) {
+        return Server.handleLambdaError(response, error);
+      }
 
       let lambda: { handler: Netlify.Handler };
+
       try {
         lambda = require(module);
       } catch (error) {
-
-        return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+        return Server.handleLambdaError(response, error);
       }
 
       const lambdaRequest = Server.lambdaRequest(request);
       const lambdaContext = Server.lambdaContext(request);
 
-      const lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+      let lambdaExecution: Promise<Netlify.Handler.Response> | void;
+
+      try {
+        lambdaExecution = lambda.handler(lambdaRequest, lambdaContext, Server.lambdaCallback(response));
+      } catch (error) {
+        return Server.handleLambdaError(response, error)
+      }
 
       if(Promise.resolve(<any>lambdaExecution) === lambdaExecution) {
         return lambdaExecution
@@ -270,27 +286,33 @@ export class Server {
   }
 
   static handleLambdaError (response: express.Response, error: Error): express.Response {
-    return response.status(500).json(`Function invocation failed: ${error.toString()}`);
+    Logger.error(`lambda invocation failed: ${error.toString()}`);
+
+    return response.status(500).json(`lambda invocation failed: ${error.toString()}`);
   }
 
   public async listen (): Promise<void> {
     try {
-      if(this.options.certificates) {
-        this.server = https.createServer(this.options.certificates, this.express);
+      if(this.certificates) {
+        this.server = https.createServer(this.certificates, this.express);
+        Logger.info("starting https server");
       } else {
         this.server = http.createServer(this.express);
+        Logger.info("starting http server");
       }
     } catch (error) {
-      Logger.info("netlify-local: unable to start server");
+      Logger.error("unable to start server");
       Logger.error(error);
       process.exit(1);
     }
 
     return new Promise<void>((resolve, reject) => {
-      this.server.listen(this.options.port, (error: Error) => {
+      this.server.listen(this.options.netlifyConfig.plugins.local.server.port, (error: Error) => {
         if(error) {
           return reject(error);
         }
+
+        Logger.good(`server up on port ${this.options.netlifyConfig.plugins.local.server.port}`);
 
         return resolve();
       });
@@ -300,8 +322,9 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        Logger.info(`netlify-local: server down on port ${this.options.port}`);
-        resolve();
+        Logger.info(`server down on port ${this.options.netlifyConfig.plugins.local.server.port}`);
+
+        return resolve();
       });
     });
   }
@@ -310,16 +333,11 @@ export class Server {
 export namespace Server {
   export interface Options {
     netlifyConfig: Netlify.Config;
-    routes: {
-      static: boolean;
-      lambda: boolean;
-    };
-    certificates?: {
-      key: string;
-      cert: string;
-    };
-    port: number;
   }
+  export interface Certificates {
+    key: string;
+    cert: string;
+  };
   export interface Paths {
     static: string;
     lambda: string;
