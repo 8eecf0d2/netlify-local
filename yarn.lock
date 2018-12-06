@@ -7,8 +7,8 @@
   resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.0.tgz#d1d55958d1fccc5527d4aba29fc9c4b942f563ff"
 
 "@types/assert@^1.4.0":
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/@types/assert/-/assert-1.4.0.tgz#95a469cbb1bb94b21e9deb5fd1939859c613a87f"
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.4.1.tgz#6b59cab35f9446331669aa3eb1f33b1193132937"
 
 "@types/body-parser@*", "@types/body-parser@^1.17.0":
   version "1.17.0"
