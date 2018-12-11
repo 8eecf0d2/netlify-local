@@ -31,6 +31,11 @@ export const parseNetlifyConfig = (filename: string, overrides?: Netlify.Plugins
   };
   const context = process.env.NETLIFY_LOCAL_CONTEXT || gitBranch.sync();
 
+  netlifyConfig.build = {
+    base: "",
+    ...netlifyConfig.build,
+  }
+
   if(netlifyConfig.context && netlifyConfig.context[context]) {
     netlifyConfig.build = {
       ...netlifyConfig.build,
