@@ -8,6 +8,7 @@ import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
 import * as UrlPattern from "url-pattern";
+import * as getPort from "get-port"
 //@ts-ignore
 import * as expressHttpProxy from "express-http-proxy";
 
@@ -306,6 +307,14 @@ export class Server {
       process.exit(1);
     }
 
+    const availablePort = await getPort({ port: parseInt(<any>this.options.netlifyConfig.plugins.local.server.port) });
+
+    if(!this.options.findAvailablePort && availablePort !== this.options.netlifyConfig.plugins.local.server.port) {
+      throw new Error(`server cannot listen on port ${this.options.netlifyConfig.plugins.local.server.port}`)
+    }
+
+    this.options.netlifyConfig.plugins.local.server.port = availablePort;
+
     return new Promise<void>((resolve, reject) => {
       this.server.listen(this.options.netlifyConfig.plugins.local.server.port, (error: Error) => {
         if(error) {
@@ -333,6 +342,7 @@ export class Server {
 export namespace Server {
   export interface Options {
     netlifyConfig: Netlify.Config;
+    findAvailablePort?: boolean;
   }
   export interface Certificates {
     key: string;
