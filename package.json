@@ -27,6 +27,7 @@
     "@types/jsonwebtoken": "^8.3.0",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.11.7",
+    "@types/serve-static": "^1.13.2",
     "@types/webpack": "^4.4.16",
     "assert": "^1.4.1",
     "mocha": "^5.2.0",
@@ -44,6 +45,7 @@
     "jsonwebtoken": "^8.3.0",
     "toml": "^2.3.3",
     "url-pattern": "^1.0.3",
+    "serve-static": "^1.13.2",
     "webpack": "^4.20.2"
   }
 }
