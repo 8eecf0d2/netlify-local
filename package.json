@@ -47,5 +47,8 @@
     "url-pattern": "^1.0.3",
     "serve-static": "^1.13.2",
     "webpack": "^4.20.2"
-  }
+  },
+  "files": [
+    ".dist"
+  ]
 }
