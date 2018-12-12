@@ -7,6 +7,7 @@ import * as program from "commander";
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
 import { Server } from "./server";
+import { Build } from "./build";
 import { Webpack } from "./webpack";
 import { parseNetlifyConfig, parseNetlifyPluginLocalConfig, parseSslCertificates, parseWebpackConfig } from "./config";
 
@@ -55,6 +56,38 @@ program
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
+
+    })()
+      .catch(error => {
+        Logger.error(error)
+        process.exit(1);
+      })
+  });
+
+program
+  .command("build")
+  .description("Execute Netlify build")
+  .action(() => {
+    (async () => {
+      if(program.context) {
+        process.env.NETLIFY_LOCAL_CONTEXT = program.context;
+      }
+
+      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
+        webpack: {
+          config: program.webpack,
+        },
+        server: {
+          static: false,
+          lambda: false,
+          certificates: undefined,
+          port: 9000,
+        }
+      });
+
+      try {
+        await Build.from(netlifyConfig);
+      } catch(error) {}
 
     })()
       .catch(error => {
