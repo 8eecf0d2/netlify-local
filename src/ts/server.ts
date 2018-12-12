@@ -333,6 +333,7 @@ export class Server {
 export namespace Server {
   export interface Options {
     netlifyConfig: Netlify.Config;
+    findAvailablePort?: boolean;
   }
   export interface Certificates {
     key: string;

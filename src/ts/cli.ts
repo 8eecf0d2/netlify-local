@@ -46,6 +46,7 @@ program
 
       const server = new Server({
         netlifyConfig: netlifyConfig,
+        findAvailablePort: !program.hasOwnProperty("port"),
       });
 
       await server.listen();
