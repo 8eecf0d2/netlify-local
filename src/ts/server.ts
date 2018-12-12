@@ -313,13 +313,15 @@ export class Server {
       throw new Error(`server cannot listen on port ${this.options.netlifyConfig.plugins.local.server.port}`)
     }
 
+    this.options.netlifyConfig.plugins.local.server.port = availablePort;
+
     return new Promise<void>((resolve, reject) => {
-      this.server.listen(availablePort, (error: Error) => {
+      this.server.listen(this.options.netlifyConfig.plugins.local.server.port, (error: Error) => {
         if(error) {
           return reject(error);
         }
 
-        Logger.good(`server up on port ${availablePort}`);
+        Logger.good(`server up on port ${this.options.netlifyConfig.plugins.local.server.port}`);
 
         return resolve();
       });
@@ -329,7 +331,7 @@ export class Server {
   public close (): Promise<void> {
     return new Promise(resolve => {
       this.server.close(() => {
-        Logger.info(`server down on port ${availablePort}`);
+        Logger.info(`server down on port ${this.options.netlifyConfig.plugins.local.server.port}`);
 
         return resolve();
       });
