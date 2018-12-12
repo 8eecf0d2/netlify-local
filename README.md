@@ -23,12 +23,20 @@ yarn add -D netlify-local
 
 ### Usage
 
-Currently **netlify-local** only provides a **serve** command.
+#### `serve` command
+The [**serve** command](https://github.com/8eecf0d2/netlify-local/wiki/Command-Serve) will attempt to emulate Netlify Services.
 ```bash
 netlify-local serve <options>
 ```
 
-For a detailed list of options [see the wiki](https://github.com/8eecf0d2/netlify-local/wiki/Serve-Options).
+#### `build` command
+The [**build** command](https://github.com/8eecf0d2/netlify-local/wiki/Command-Build) will attempt to correctly execute the `build.command` property within `netlify.toml`.
+```bash
+netlify-local build <options>
+```
+
+#### Options
+You can view a detailed [list of options in the wiki](https://github.com/8eecf0d2/netlify-local/wiki/Options).
 
 ### Features
 
