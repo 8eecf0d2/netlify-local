@@ -1,6 +1,6 @@
 {
   "name": "netlify-local",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "description": "Local Netlify service emulation",
   "main": ".dist/index.js",
   "types": ".dist/index.d.ts",
