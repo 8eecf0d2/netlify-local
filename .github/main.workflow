@@ -17,7 +17,7 @@ action "Test" {
 action "Master" {
   needs = "Test"
   uses = "actions/bin/filter@master"
-  args = "tag *.*.*"
+  args = "tag"
 }
 
 action "Publish" {
