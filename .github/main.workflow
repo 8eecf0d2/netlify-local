@@ -9,19 +9,19 @@ action "Install" {
 }
 
 action "Test" {
-  needs = ["Install"]
+  needs = "Install"
   uses = "borales/actions-yarn@master"
   args = "test"
 }
 
-action "Release Tag" {
-  needs = ["Test"]
+action "Master" {
+  needs = "Test"
   uses = "actions/bin/filter@master"
-  args = "tag *.*.*"
+  args = "tag"
 }
 
 action "Publish" {
- needs = ["Release Tag"]
+ needs = "Master"
  uses = "borales/actions-yarn@master"
  args = "publish --access public"
  secrets = ["NPM_AUTH_TOKEN"]
