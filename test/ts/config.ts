@@ -32,7 +32,9 @@ mocha.describe('Config', () => {
       assert.throws(() => parseWebpackConfig("test/assets/webpack.config.js" + Math.random()));
     });
     mocha.it('should correctly import webpack config', () => {
-      const webpackConfig = <Webpack.Config>parseWebpackConfig("test/assets/webpack.config.js");
+      const webpackConfigs = parseWebpackConfig("test/assets/webpack.config.js");
+
+      const webpackConfig = webpackConfigs[0];
 
       assert.equal(webpackConfig.target, "node");
     });
