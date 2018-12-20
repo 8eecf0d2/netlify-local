@@ -17,7 +17,7 @@ action "Test" {
 action "Master" {
   needs = "Test"
   uses = "actions/bin/filter@master"
-  args = "tag"
+  args = "branch master"
 }
 
 action "Publish" {
