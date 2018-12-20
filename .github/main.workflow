@@ -1,6 +1,6 @@
 workflow "Install and Test" {
   on = "push"
-  resolves = ["Test"]
+  resolves = ["Publish"]
 }
 
 action "Install" {
@@ -14,9 +14,15 @@ action "Test" {
   args = "test"
 }
 
-# action "Publish" {
-#  needs = "Test"
-#  uses = "borales/actions-yarn@master"
-#  args = "publish --access public"
-#  secrets = ["NPM_AUTH_TOKEN"]
-# }
+action "Release Tag" {
+  needs = ["Test"]
+  uses = "actions/bin/filter@master"
+  args = "tag *.*.*"
+}
+
+action "Publish" {
+ needs = ["Release Tag"]
+ uses = "borales/actions-yarn@master"
+ args = "publish --access public"
+ secrets = ["NPM_AUTH_TOKEN"]
+}
