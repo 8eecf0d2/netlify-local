@@ -6,10 +6,8 @@ import * as program from "commander";
 
 import { Logger } from "./helper";
 import { Netlify } from "./netlify";
-import { Server } from "./server";
-import { Build } from "./build";
-import { Webpack } from "./webpack";
-import { parseNetlifyConfig, parseNetlifyPluginLocalConfig, parseSslCertificates, parseWebpackConfig } from "./config";
+import { parseNetlifyConfig, parseNetlifyPluginLocalConfig, parseSslCertificates, parseWebpackConfig, Server, Webpack } from "./utility";
+import { Build, Bundle } from "./command";
 
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"));
 
@@ -77,18 +75,45 @@ program
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
-        },
-        server: {
-          static: false,
-          lambda: false,
-          certificates: undefined,
-          port: 9000,
         }
       });
 
       try {
         await Build.from(netlifyConfig);
-      } catch(error) {}
+      } catch(error) {
+        Logger.error(error);
+      }
+
+    })()
+      .catch(error => {
+        Logger.error(error)
+        process.exit(1);
+      })
+  });
+
+program
+  .command("bundle")
+  .description("Bundle Netlify functions")
+  .action(() => {
+    (async () => {
+      if(program.context) {
+        process.env.NETLIFY_LOCAL_CONTEXT = program.context;
+      }
+
+      const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
+        webpack: {
+          config: program.webpack,
+        }
+      });
+
+      const webpackConfigs = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
+      const functionsConfig = webpackConfigs.find(config => config.name === "functions");
+
+      try {
+        const parsedConfig = Bundle.buildWebpackFunctionsConfig(netlifyConfig, functionsConfig);
+      } catch(error) {
+        Logger.error(error);
+      }
 
     })()
       .catch(error => {
