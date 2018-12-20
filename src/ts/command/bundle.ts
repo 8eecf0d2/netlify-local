@@ -11,8 +11,6 @@ export class Bundle {
       entry: composeWebpackEntry(netlifyConfig),
       output: composeWebpackOutput(netlifyConfig),
     };
-
-    console.log(parsedWebpackConfig)
   }
 
 }

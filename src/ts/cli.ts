@@ -27,7 +27,7 @@ program
   .description("Locally emulate Netlify services")
   .action(() => {
     (async () => {
-      if(program.context) {
+      if (program.context) {
         process.env.NETLIFY_LOCAL_CONTEXT = program.context;
       }
 
@@ -39,8 +39,8 @@ program
           static: program.static === undefined ? undefined : program.static === "false" ? false : true,
           lambda: program.lambda === undefined ? undefined : program.lambda === "false" ? false : true,
           certificates: program.certificates,
-          port: program.hasOwnProperty("port") ? parseInt(program.port) : undefined,
-        }
+          port: program.hasOwnProperty("port") ? parseInt(program.port, 10) : undefined,
+        },
       });
 
       const server = new Server({
@@ -50,17 +50,17 @@ program
 
       await server.listen();
 
-      if(netlifyConfig.plugins.local.webpack.config) {
+      if (netlifyConfig.plugins.local.webpack.config) {
         const webpackConfig = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
         const webpack = new Webpack(webpackConfig);
         webpack.watch();
       }
 
     })()
-      .catch(error => {
-        Logger.error(error)
+      .catch((error) => {
+        Logger.error(error);
         process.exit(1);
-      })
+      });
   });
 
 program
@@ -68,27 +68,27 @@ program
   .description("Execute Netlify build")
   .action(() => {
     (async () => {
-      if(program.context) {
+      if (program.context) {
         process.env.NETLIFY_LOCAL_CONTEXT = program.context;
       }
 
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
-        }
+        },
       });
 
       try {
         await Build.from(netlifyConfig);
-      } catch(error) {
+      } catch (error) {
         Logger.error(error);
       }
 
     })()
-      .catch(error => {
-        Logger.error(error)
+      .catch((error) => {
+        Logger.error(error);
         process.exit(1);
-      })
+      });
   });
 
 program
@@ -96,30 +96,30 @@ program
   .description("Bundle Netlify functions")
   .action(() => {
     (async () => {
-      if(program.context) {
+      if (program.context) {
         process.env.NETLIFY_LOCAL_CONTEXT = program.context;
       }
 
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
-        }
+        },
       });
 
       const webpackConfigs = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
-      const functionsConfig = webpackConfigs.find(config => config.name === "functions");
+      const functionsConfig = webpackConfigs.find((config) => config.name === "functions");
 
       try {
         const parsedConfig = Bundle.buildWebpackFunctionsConfig(netlifyConfig, functionsConfig);
-      } catch(error) {
+      } catch (error) {
         Logger.error(error);
       }
 
     })()
-      .catch(error => {
-        Logger.error(error)
+      .catch((error) => {
+        Logger.error(error);
         process.exit(1);
-      })
+      });
   });
 
 program.parse(process.argv);

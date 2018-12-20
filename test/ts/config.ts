@@ -3,7 +3,7 @@ import * as assert from "assert";
 
 import { Webpack, parseNetlifyConfig, parseWebpackConfig } from "../../dist";
 
-process.env.NETLIFY_LOCAL_CONTEXT = "default"
+process.env.NETLIFY_LOCAL_CONTEXT = "default";
 
 mocha.describe('Config', () => {
   mocha.describe('parseNetlifyConfig', () => {

@@ -8,13 +8,13 @@ export namespace Netlify {
       environment?: {
         [key: string]: string;
       };
-    }
+    };
     context?: any;
-    redirects: Netlify.Redirect[];
-    headers: Netlify.Headers[];
+    redirects: Array<Netlify.Redirect>;
+    headers: Array<Netlify.Headers>;
     plugins?: {
       local?: Netlify.Plugins.Local;
-    }
+    };
   }
   export namespace Plugins {
     export interface Local {
@@ -29,7 +29,7 @@ export namespace Netlify {
       };
       functions?: {
         source: string;
-        files: string[];
+        files: Array<string>;
       };
     }
   }
@@ -46,7 +46,7 @@ export namespace Netlify {
     for: string;
     values: {
       [key: string]: string;
-    }
+    };
   }
   export namespace Handler {
     export interface Response {
@@ -54,17 +54,17 @@ export namespace Netlify {
       body: any;
       headers?: {
         [key: string]: string;
-      }
+      };
       isBase64Encoded?: boolean;
     }
     export interface Request {
       path: string;
       httpMethod: string;
       queryStringParameters: {
-        [key: string]: string | string[];
+        [key: string]: string | Array<string>;
       };
       headers: {
-        [key: string]: string | string[];
+        [key: string]: string | Array<string>;
       };
       body: any;
       isBase64Encoded: boolean;
