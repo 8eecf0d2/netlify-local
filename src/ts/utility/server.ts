@@ -12,8 +12,8 @@ import * as getPort from "get-port"
 //@ts-ignore
 import * as expressHttpProxy from "express-http-proxy";
 
-import { Logger } from "./helper";
-import { Netlify } from "./netlify";
+import { Logger } from "../helper";
+import { Netlify } from "../netlify";
 import { parseSslCertificates } from "./config";
 
 export class Server {
