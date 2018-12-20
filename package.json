@@ -2,10 +2,10 @@
   "name": "netlify-local",
   "version": "1.6.7",
   "description": "Local Netlify service emulation",
-  "main": ".dist/index.js",
-  "types": ".dist/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "netlify-local": ".dist/cli.js"
+    "netlify-local": "dist/cli.js"
   },
   "repository": "https://github.com/8eecf0d2/netlify-local.git",
   "author": "8eecf0d2 <8eecf0d23d248b0e6223b8a10ddbf1@gmail.com>",
