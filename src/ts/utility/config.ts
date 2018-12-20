@@ -3,10 +3,10 @@ import * as path from "path";
 import * as toml from "toml";
 import * as gitBranch from "git-branch";
 
-import { Netlify } from "./netlify";
+import { Netlify } from "../netlify";
 import { Webpack } from "./webpack";
 
-export const parseWebpackConfig = (filename: string): Webpack.Config|Webpack.Config[] => {
+export const parseWebpackConfig = (filename: string): Webpack.Config[] => {
   const webpackConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
 
   if(!webpackConfigExists) {
@@ -15,13 +15,31 @@ export const parseWebpackConfig = (filename: string): Webpack.Config|Webpack.Con
 
   const webpackConfig = require(path.join(process.cwd(), filename));
 
-  return webpackConfig;
+  return !Array.isArray(webpackConfig) ? [webpackConfig] : webpackConfig;
+}
+
+export const composeWebpackEntry = (netlifyConfig: Netlify.Config) => {
+  return netlifyConfig.plugins.local.functions.files.reduce(function (obj, inputPath) {
+    const outputPath = inputPath.split(".")[0].replace(/\//g, "-");
+    return {
+      ...obj,
+      [outputPath]: path.join(process.cwd(), netlifyConfig.plugins.local.functions.source, inputPath),
+    };
+  }, {});
+}
+
+export const composeWebpackOutput = (netlifyConfig: Netlify.Config): { path: string, filename: string, libraryTarget: string} => {
+  return {
+    path: path.join(process.cwd(), netlifyConfig.build.functions),
+    filename: "[name].js",
+    libraryTarget: "commonjs"
+  }
 }
 
 export const parseNetlifyConfig = (filename: string, overrides?: Netlify.Plugins.Local): Netlify.Config => {
   const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
   if(!netlifyConfigExists) {
-    throw new Error(`cannot find netlify configuration file "${filename}"`);
+    throw new Error(`cannot find netlify configuration file "${path.join(process.cwd(), String(filename))}"`);
   }
 
   const netlifyConfig: Netlify.Config = {

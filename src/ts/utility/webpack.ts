@@ -1,5 +1,5 @@
 import * as webpack from "webpack";
-import { Logger } from "./helper";
+import { Logger } from "../helper";
 
 export class Webpack {
   private configs: Webpack.Config[];
