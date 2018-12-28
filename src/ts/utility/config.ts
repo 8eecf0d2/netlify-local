@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as toml from "toml";
+import * as webpack from "webpack";
 import * as gitBranch from "git-branch";
 
 import { Netlify } from "../netlify";
@@ -28,7 +29,7 @@ export const composeWebpackEntry = (netlifyConfig: Netlify.Config) => {
   }, {});
 };
 
-export const composeWebpackOutput = (netlifyConfig: Netlify.Config): { path: string, filename: string, libraryTarget: string} => {
+export const composeWebpackOutput = (netlifyConfig: Netlify.Config): { path: string, filename: string, libraryTarget: webpack.LibraryTarget} => {
   return {
     path: path.join(process.cwd(), netlifyConfig.build.functions),
     filename: "[name].js",
