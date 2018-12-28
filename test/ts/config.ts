@@ -1,9 +1,9 @@
 import * as mocha from "mocha";
 import * as assert from "assert";
 
-import { Webpack, parseNetlifyConfig, parseWebpackConfig } from "../../.dist";
+import { Webpack, parseNetlifyConfig, parseWebpackConfig } from "../../dist";
 
-process.env.NETLIFY_LOCAL_CONTEXT = "default"
+process.env.NETLIFY_LOCAL_CONTEXT = "default";
 
 mocha.describe('Config', () => {
   mocha.describe('parseNetlifyConfig', () => {
@@ -32,7 +32,9 @@ mocha.describe('Config', () => {
       assert.throws(() => parseWebpackConfig("test/assets/webpack.config.js" + Math.random()));
     });
     mocha.it('should correctly import webpack config', () => {
-      const webpackConfig = <Webpack.Config>parseWebpackConfig("test/assets/webpack.config.js");
+      const webpackConfigs = parseWebpackConfig("test/assets/webpack.config.js");
+
+      const webpackConfig = webpackConfigs[0];
 
       assert.equal(webpackConfig.target, "node");
     });

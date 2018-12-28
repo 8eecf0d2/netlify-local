@@ -7,8 +7,8 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationDir": ".dist",
-    "outDir": ".dist",
+    "declarationDir": "dist",
+    "outDir": "dist",
     "lib": [ "ES2015", "ES2017" ]
   },
   "include": [ "src/ts/**/*.ts" ],

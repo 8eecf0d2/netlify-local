@@ -1,74 +1,93 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as toml from "toml";
+import * as webpack from "webpack";
 import * as gitBranch from "git-branch";
 
-import { Netlify } from "./netlify";
+import { Netlify } from "../netlify";
 import { Webpack } from "./webpack";
 
-export const parseWebpackConfig = (filename: string): Webpack.Config|Webpack.Config[] => {
+export const parseWebpackConfig = (filename: string): Array<Webpack.Config> => {
   const webpackConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
 
-  if(!webpackConfigExists) {
+  if (!webpackConfigExists) {
     throw new Error(`cannot find webpack configuration file "${filename}"`);
   }
 
   const webpackConfig = require(path.join(process.cwd(), filename));
 
-  return webpackConfig;
-}
+  return !Array.isArray(webpackConfig) ? [webpackConfig] : webpackConfig;
+};
+
+export const composeWebpackEntry = (netlifyConfig: Netlify.Config) => {
+  return netlifyConfig.plugins.local.functions.files.reduce((obj, inputPath) => {
+    const outputPath = inputPath.split(".")[0].replace(/\//g, "-");
+    return {
+      ...obj,
+      [outputPath]: path.join(process.cwd(), netlifyConfig.plugins.local.functions.source, inputPath),
+    };
+  }, {});
+};
+
+export const composeWebpackOutput = (netlifyConfig: Netlify.Config): { path: string, filename: string, libraryTarget: webpack.LibraryTarget} => {
+  return {
+    path: path.join(process.cwd(), netlifyConfig.build.functions),
+    filename: "[name].js",
+    libraryTarget: "commonjs",
+  };
+};
 
 export const parseNetlifyConfig = (filename: string, overrides?: Netlify.Plugins.Local): Netlify.Config => {
   const netlifyConfigExists = fs.existsSync(path.join(process.cwd(), String(filename)));
-  if(!netlifyConfigExists) {
-    throw new Error(`cannot find netlify configuration file "${filename}"`);
+  if (!netlifyConfigExists) {
+    throw new Error(`cannot find netlify configuration file "${path.join(process.cwd(), String(filename))}"`);
   }
 
   const netlifyConfig: Netlify.Config = {
     redirects: [],
     headers: [],
-    ...toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8"))
+    ...toml.parse(fs.readFileSync(path.join(process.cwd(), filename), "utf8")),
   };
   const context = process.env.NETLIFY_LOCAL_CONTEXT || gitBranch.sync();
 
   netlifyConfig.build = {
     base: "",
     ...netlifyConfig.build,
-  }
+  };
 
-  if(netlifyConfig.context && netlifyConfig.context[context]) {
+  if (netlifyConfig.context && netlifyConfig.context[context]) {
     netlifyConfig.build = {
       ...netlifyConfig.build,
       ...netlifyConfig.context[context],
       environment: {
         ...netlifyConfig.build.environment,
-        ...netlifyConfig.context[context].environment
+        ...netlifyConfig.context[context].environment,
       },
-    }
+    };
   }
 
-  if(netlifyConfig.build.environment) {
-    for(const variable in netlifyConfig.build.environment) {
+  if (netlifyConfig.build.environment) {
+    for (const variable of Object.keys(netlifyConfig.build.environment)) {
       process.env[variable] = netlifyConfig.build.environment[variable];
     }
   }
 
-  if(netlifyConfig.redirects) {
-    netlifyConfig.redirects = netlifyConfig.redirects.map(redirect => {
+  if (netlifyConfig.redirects) {
+    netlifyConfig.redirects = netlifyConfig.redirects.map((redirect) => {
       return {
         status: 301,
         force: false,
         ...redirect,
-      }
+      };
     });
   }
 
   netlifyConfig.plugins = {
     local: parseNetlifyPluginLocalConfig(netlifyConfig, overrides),
-  }
+  };
 
   return netlifyConfig;
-}
+};
 
 export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, overrides?: Netlify.Plugins.Local): Netlify.Plugins.Local => {
   const netlifyPluginLocalConfig: Netlify.Plugins.Local = {
@@ -88,32 +107,32 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
   };
 
   /** Parse config from Netlify configuration plugins */
-  if(netlifyConfig.plugins) {
-    if(netlifyConfig.plugins.local) {
-      if(netlifyConfig.plugins.local.webpack !== undefined) {
-        if(netlifyConfig.plugins.local.webpack.config !== undefined) {
+  if (netlifyConfig.plugins) {
+    if (netlifyConfig.plugins.local) {
+      if (netlifyConfig.plugins.local.webpack !== undefined) {
+        if (netlifyConfig.plugins.local.webpack.config !== undefined) {
           netlifyPluginLocalConfig.webpack.config = netlifyConfig.plugins.local.webpack.config;
         }
       }
-      if(netlifyConfig.plugins.local.server !== undefined) {
-        if(netlifyConfig.plugins.local.server.static !== undefined) {
+      if (netlifyConfig.plugins.local.server !== undefined) {
+        if (netlifyConfig.plugins.local.server.static !== undefined) {
           netlifyPluginLocalConfig.server.static = netlifyConfig.plugins.local.server.static;
         }
-        if(netlifyConfig.plugins.local.server.lambda !== undefined) {
+        if (netlifyConfig.plugins.local.server.lambda !== undefined) {
           netlifyPluginLocalConfig.server.lambda = netlifyConfig.plugins.local.server.lambda;
         }
-        if(netlifyConfig.plugins.local.server.certificates !== undefined) {
+        if (netlifyConfig.plugins.local.server.certificates !== undefined) {
           netlifyPluginLocalConfig.server.certificates = netlifyConfig.plugins.local.server.certificates;
         }
-        if(netlifyConfig.plugins.local.server.port !== undefined) {
+        if (netlifyConfig.plugins.local.server.port !== undefined) {
           netlifyPluginLocalConfig.server.port = netlifyConfig.plugins.local.server.port;
         }
       }
-      if(netlifyConfig.plugins.local.functions !== undefined) {
-        if(netlifyConfig.plugins.local.functions.source !== undefined) {
+      if (netlifyConfig.plugins.local.functions !== undefined) {
+        if (netlifyConfig.plugins.local.functions.source !== undefined) {
           netlifyPluginLocalConfig.functions.source = netlifyConfig.plugins.local.functions.source;
         }
-        if(netlifyConfig.plugins.local.functions.files !== undefined) {
+        if (netlifyConfig.plugins.local.functions.files !== undefined) {
           netlifyPluginLocalConfig.functions.files = netlifyConfig.plugins.local.functions.files;
         }
       }
@@ -121,31 +140,30 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
   }
 
   /** Parse command line options */
-  if(overrides) {
-    if(overrides.webpack !== undefined) {
-      if(overrides.webpack.config !== undefined) {
+  if (overrides) {
+    if (overrides.webpack !== undefined) {
+      if (overrides.webpack.config !== undefined) {
         netlifyPluginLocalConfig.webpack.config = overrides.webpack.config;
       }
     }
-    if(overrides.server !== undefined) {
-      if(overrides.server.static !== undefined) {
+    if (overrides.server !== undefined) {
+      if (overrides.server.static !== undefined) {
         netlifyPluginLocalConfig.server.static = overrides.server.static;
       }
-      if(overrides.server.lambda !== undefined) {
+      if (overrides.server.lambda !== undefined) {
         netlifyPluginLocalConfig.server.lambda = overrides.server.lambda;
       }
-      if(overrides.server.certificates !== undefined) {
+      if (overrides.server.certificates !== undefined) {
         netlifyPluginLocalConfig.server.certificates = overrides.server.certificates;
       }
-      if(overrides.server.port !== undefined) {
+      if (overrides.server.port !== undefined) {
         netlifyPluginLocalConfig.server.port = overrides.server.port;
       }
     }
   }
 
   return netlifyPluginLocalConfig;
-}
-
+};
 
 export const parseSslCertificates = (directory?: string): { key: string, cert: string } => {
   const keyFilePath = path.join(process.cwd(), directory, "key.pem");
@@ -153,16 +171,16 @@ export const parseSslCertificates = (directory?: string): { key: string, cert: s
   const keyFileExists = fs.existsSync(keyFilePath);
   const certFileExists = fs.existsSync(certFilePath);
 
-  if(!keyFileExists) {
+  if (!keyFileExists) {
     throw new Error(`cannot find certificate key file "${keyFilePath}"`);
   }
 
-  if(!certFileExists) {
+  if (!certFileExists) {
     throw new Error(`cannot find certificate cert file in "${certFilePath}"`);
   }
 
   return {
     key: fs.readFileSync(keyFilePath, "utf8"),
     cert: fs.readFileSync(certFilePath, "utf8"),
-  }
-}
+  };
+};
