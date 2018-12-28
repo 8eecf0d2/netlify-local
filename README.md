@@ -36,7 +36,7 @@ netlify-local build <options>
 ```
 
 #### `bundle` command
-The [**bundle** command](https://github.com/8eecf0d2/netlify-local/wiki/Command-Bundle) will attempt to parse your `netlify.toml` and update your Webpack Configuration with the correct `entry` and `output` properties.
+The [**bundle** command](https://github.com/8eecf0d2/netlify-local/wiki/Command-Bundle) will attempt to parse your `netlify.toml` and build a Webpack Configuration with the correct `entry` and `output` properties before running a Webpack compiler with the computed configuration.
 ```bash
 netlify-local bundle <options>
 ```
