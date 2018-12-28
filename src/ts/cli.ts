@@ -106,11 +106,8 @@ program
         },
       });
 
-      const webpackConfigs = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
-      const functionsConfig = webpackConfigs.find((config) => config.name === "functions");
-
       try {
-        const parsedConfig = Bundle.buildWebpackFunctionsConfig(netlifyConfig, functionsConfig);
+        await Bundle.start(netlifyConfig);
       } catch (error) {
         Logger.error(error);
       }
