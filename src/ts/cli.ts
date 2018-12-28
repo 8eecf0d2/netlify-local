@@ -79,7 +79,7 @@ program
       });
 
       try {
-        await Build.from(netlifyConfig);
+        await Build.start(netlifyConfig);
       } catch (error) {
         Logger.error(error);
       }

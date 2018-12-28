@@ -4,8 +4,7 @@ import { Logger } from "../helper";
 import { Netlify} from "../netlify";
 
 export class Build {
-
-  public static async from(netlifyConfig: Netlify.Config): Promise<void> {
+  public static async start(netlifyConfig: Netlify.Config): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       Logger.info("build started");
       const buildCommand = Build.objectToEnvironmentVariables(netlifyConfig.build.environment || {}) + netlifyConfig.build.command;
