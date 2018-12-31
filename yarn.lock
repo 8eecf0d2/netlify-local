@@ -55,8 +55,9 @@
   integrity sha512-Zp1GxOt3GNbIQqz2hSHSH7LALpTPvPHMA/aYut3VeitDgGwqcXEVvDQWWP3kPABsh3CGSHPSt67DN6jnc7oJMA==
 
 "@types/git-branch@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/@types/git-branch/-/git-branch-2.0.0.tgz#27a17ddd245aefb75c9de3c4cacacbd8e4fbc56e"
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/git-branch/-/git-branch-2.0.1.tgz#9a38eb3024f30b567b92002f8b09e85d2acdbd2b"
+  integrity sha512-I7SzZ6rgn0yRLU4wPbZv6UeKJ3C5XAk1zTwyLOeZXqrW+z6/q6axQcDVPiUKCGv4M5WmOt4TrsnHuj7qOn4Nsg==
 
 "@types/json5@^0.0.29":
   version "0.0.29"
