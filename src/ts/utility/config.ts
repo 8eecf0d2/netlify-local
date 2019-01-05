@@ -29,7 +29,7 @@ export const composeWebpackEntry = (netlifyConfig: Netlify.Config) => {
   }, {});
 };
 
-export const composeWebpackOutput = (netlifyConfig: Netlify.Config): { path: string, filename: string, libraryTarget: webpack.LibraryTarget} => {
+export const composeWebpackOutput = (netlifyConfig: Netlify.Config): webpack.Output => {
   return {
     path: path.join(process.cwd(), netlifyConfig.build.functions),
     filename: "[name].js",
