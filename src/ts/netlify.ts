@@ -20,6 +20,7 @@ export namespace Netlify {
     export interface Local {
       webpack?: {
         config: string;
+        hmr: boolean;
       };
       server?: {
         static?: boolean;
