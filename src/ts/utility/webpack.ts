@@ -10,7 +10,7 @@ export class Webpack {
     this.initialize();
   }
   private configs: Array<Webpack.Config>;
-  private compilers: Array<webpack.Compiler>;
+  public compilers: Array<webpack.Compiler>;
 
   public initialize(): void {
     this.compilers = this.configs.map((config) => webpack(config));

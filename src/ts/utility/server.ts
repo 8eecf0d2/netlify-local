@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as express from "express";
+import * as webpack from "webpack";
 import * as bodyParser from "body-parser";
 import * as serveStatic from "serve-static";
 import * as queryString from "querystring";
@@ -8,9 +9,11 @@ import * as http from "http";
 import * as https from "https";
 import { URL } from "url";
 import * as UrlPattern from "url-pattern";
+// @ts-ignore
 import * as getPort from "get-port";
 // @ts-ignore
 import * as expressHttpProxy from "express-http-proxy";
+import * as webpackHotMiddleware from "webpack-hot-middleware";
 
 import { Logger } from "../helper";
 import { Netlify } from "../netlify";
@@ -185,6 +188,10 @@ export class Server {
     this.express.use(bodyParser.raw({ limit: "6mb" }));
     this.express.use(bodyParser.text({ limit: "6mb", type: "*/*" }));
 
+    if(this.options.netlifyConfig.plugins.local.webpack.hmr) {
+      this.webpackHotMiddleware(this.options.compilers);
+    }
+
     const hardRedirects = this.options.netlifyConfig.redirects.filter((redirect) => redirect.force === true);
     const softRedirects = this.options.netlifyConfig.redirects.filter((redirect) => redirect.force === false);
 
@@ -193,6 +200,14 @@ export class Server {
     this.routeLambda();
     this.routeStatic();
     this.routeRedirects(softRedirects);
+  }
+
+  public webpackHotMiddleware(compilers: Array<webpack.Compiler>): void {
+    const clientCompiler = compilers.find(compiler => compiler.name === "client");
+    const clientMiddleware = webpackHotMiddleware(clientCompiler, {
+      log: false,
+    });
+    this.express.use(clientMiddleware);
   }
 
   /**
@@ -343,6 +358,7 @@ export namespace Server {
   export interface Options {
     netlifyConfig: Netlify.Config;
     findAvailablePort?: boolean;
+    compilers?: Array<webpack.Compiler>;
   }
   export interface Certificates {
     key: string;

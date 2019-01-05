@@ -2,6 +2,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import * as webpack from "webpack";
 import * as program from "commander";
 
 import { Logger } from "./helper";
@@ -34,6 +35,7 @@ program
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
+          hmr: program.hmr,
         },
         server: {
           static: program.static === undefined ? undefined : program.static === "false" ? false : true,
@@ -43,18 +45,22 @@ program
         },
       });
 
-      const server = new Server({
-        netlifyConfig: netlifyConfig,
-        findAvailablePort: !program.hasOwnProperty("port"),
-      });
-
-      await server.listen();
+      let compilers: Array<webpack.Compiler>;
 
       if (netlifyConfig.plugins.local.webpack.config) {
         const webpackConfig = parseWebpackConfig(netlifyConfig.plugins.local.webpack.config);
-        const webpack = new Webpack(webpackConfig);
-        webpack.watch();
+        const webpackClient = new Webpack(webpackConfig);
+        compilers = webpackClient.compilers;
+        webpackClient.watch();
       }
+
+      const server = new Server({
+        netlifyConfig: netlifyConfig,
+        findAvailablePort: !program.hasOwnProperty("port"),
+        compilers: compilers,
+      });
+
+      await server.listen();
 
     })()
       .catch((error) => {
@@ -75,6 +81,7 @@ program
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
+          hmr: program.hmr,
         },
       });
 
@@ -103,6 +110,7 @@ program
       const netlifyConfig = parseNetlifyConfig(program.netlify || "netlify.toml", {
         webpack: {
           config: program.webpack,
+          hmr: program.hmr,
         },
       });
 

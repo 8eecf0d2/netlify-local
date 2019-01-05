@@ -93,6 +93,7 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
   const netlifyPluginLocalConfig: Netlify.Plugins.Local = {
     webpack: {
       config: undefined,
+      hmr: false,
     },
     server: {
       static: true,
@@ -112,6 +113,9 @@ export const parseNetlifyPluginLocalConfig = (netlifyConfig: Netlify.Config, ove
       if (netlifyConfig.plugins.local.webpack !== undefined) {
         if (netlifyConfig.plugins.local.webpack.config !== undefined) {
           netlifyPluginLocalConfig.webpack.config = netlifyConfig.plugins.local.webpack.config;
+        }
+        if (netlifyConfig.plugins.local.webpack.hmr !== undefined) {
+          netlifyPluginLocalConfig.webpack.hmr = netlifyConfig.plugins.local.webpack.hmr;
         }
       }
       if (netlifyConfig.plugins.local.server !== undefined) {
