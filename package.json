@@ -47,7 +47,7 @@
     "git-branch": "^2.0.1",
     "jsonwebtoken": "^8.3.0",
     "serve-static": "^1.13.2",
-    "toml": "^2.3.3",
+    "toml": "^3.0.0",
     "url-pattern": "^1.0.3",
     "webpack": "^4.20.2"
   },
