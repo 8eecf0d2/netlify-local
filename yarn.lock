@@ -8,9 +8,9 @@
   integrity sha512-7WcbyctkE8GTzogDb0ulRAEw7v8oIS54ft9mQTU7PfM0hp5e+8kpa+HeQ7IQrFbKtJXBKcZ4bh+Em9dTw5L6AQ==
 
 "@types/assert@^1.4.0":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.4.1.tgz#6b59cab35f9446331669aa3eb1f33b1193132937"
-  integrity sha512-pQl3KyRqexLSlHCTCtL2rpis571Qh1zye2MigJn8evskrM6B1E/PExlpTbMnk4hYoxFzBtdTcgDGF1QF7eiwLw==
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@types/assert/-/assert-1.4.2.tgz#e9116f5abf9cbd0c86ed22e38185b71e7f44071c"
+  integrity sha512-N5I8kX4ybqvqi4A+Y8b3coatbuRKWaa+sEPm3aCFdm9oCxsDvwY/ELNV4c/56W5MdRKJ6b8AOWRFyxhi437t7A==
 
 "@types/body-parser@*", "@types/body-parser@^1.17.0":
   version "1.17.0"
