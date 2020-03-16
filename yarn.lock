@@ -3142,19 +3142,19 @@ toml@^3.0.0:
   resolved "https://registry.yarnpkg.com/toml/-/toml-3.0.0.tgz#342160f1af1904ec9d204d03a5d61222d762c5ee"
   integrity sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==
 
-ts-mocha@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ts-mocha/-/ts-mocha-2.0.0.tgz#0dbd3cd04671df9933b9303b4aa46347573c5635"
-  integrity sha512-Rj6+vvwKtOTs5GsNO1jLl4DIXUGnyAg5HFt2Yb4SHIRN45clTJkHWpNdTxCSL0u+1oeavSYJah6d1PZ++Ju5pw==
+ts-mocha@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/ts-mocha/-/ts-mocha-7.0.0.tgz#f1549b48b46f53d7ae1dccbb26313c7879acb190"
+  integrity sha512-7WfkQw1W6JZXG5m4E1w2e945uWzBoZqmnOHvpMu0v+zvyKLdUQeTtRMfcQsVEKsUnYL6nTyH4okRt2PZucmFXQ==
   dependencies:
-    ts-node "7.0.0"
+    ts-node "7.0.1"
   optionalDependencies:
     tsconfig-paths "^3.5.0"
 
-ts-node@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-7.0.0.tgz#a94a13c75e5e1aa6b82814b84c68deb339ba7bff"
-  integrity sha512-klJsfswHP0FuOLsvBZ/zzCfUvakOSSxds78mVeK7I+qP76YWtxf16hEZsp3U+b0kIo82R5UatGFeblYMqabb2Q==
+ts-node@7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-7.0.1.tgz#9562dc2d1e6d248d24bc55f773e3f614337d9baf"
+  integrity sha512-BVwVbPJRspzNh2yfslyT1PSbl5uIk03EZlb493RKHN4qej/D06n1cEhjlOJG69oFsE7OT8XjpTUcYf6pKTLMhw==
   dependencies:
     arrify "^1.0.0"
     buffer-from "^1.1.0"
